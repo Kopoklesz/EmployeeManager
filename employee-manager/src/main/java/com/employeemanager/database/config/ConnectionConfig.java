@@ -44,7 +44,7 @@ public class ConnectionConfig {
     public String getJdbcUrl() {
         switch (type) {
             case MYSQL:
-                return String.format("jdbc:mysql://localhost:3306/employeedb?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+                return String.format("jdbc:mysql://%s:%d/%s?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
                         host, port, database);
             case POSTGRESQL:
                 return String.format("jdbc:postgresql://%s:%d/%s",
@@ -95,6 +95,7 @@ public class ConnectionConfig {
             case POSTGRESQL:
                 props.setProperty("ApplicationName", "EmployeeManager");
                 props.setProperty("reWriteBatchedInserts", "true");
+                props.setProperty("sslmode", "disable"); // DOCKERHEZ
                 break;
             default:
                 break;
