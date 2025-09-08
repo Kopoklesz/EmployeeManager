@@ -2,7 +2,6 @@ package com.employeemanager.util;
 
 import com.employeemanager.model.fx.WorkRecordFX;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
@@ -239,7 +238,6 @@ public class ExcelExporter {
     private void createEmployeeBasedWorksheet(Workbook workbook, List<WorkRecordFX> records) {
         Sheet sheet = workbook.createSheet("név szerint");
 
-        CellStyle headerStyle = createHeaderStyle(workbook);
         CellStyle boldStyle = createBoldStyle(workbook);
         CellStyle dateBoldStyle = createDateBoldStyle(workbook);
         CellStyle currencyBoldStyle = createCurrencyBoldStyle(workbook);
@@ -397,8 +395,6 @@ public class ExcelExporter {
 
         CellStyle headerStyle = createHeaderStyle(workbook);
         CellStyle currencyBoldStyle = createCurrencyBoldStyle(workbook);
-        CellStyle currencyStyle = createCurrencyStyle(workbook);
-        CellStyle centerStyle = createCenterStyle(workbook);
         CellStyle topDashedBorderStyle = createTopDashedBorderStyle(workbook);
         CellStyle bottomDashedBorderStyle = createBottomDashedBorderStyle(workbook);
 
@@ -540,13 +536,6 @@ public class ExcelExporter {
         return style;
     }
 
-    private CellStyle createDateStyle(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        style.setDataFormat(workbook.createDataFormat().getFormat("yyyy.mm.dd"));
-        style.setAlignment(HorizontalAlignment.CENTER);
-        return style;
-    }
-
     private CellStyle createDateBoldStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
@@ -585,15 +574,6 @@ public class ExcelExporter {
         Font font = workbook.createFont();
         font.setBold(true);
         style.setFont(font);
-        return style;
-    }
-
-    private CellStyle createDashedBorderStyle(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        style.setBorderBottom(BorderStyle.DASHED);
-        style.setBorderTop(BorderStyle.DASHED);
-        // Oldalak nyitva maradnak - nincs bal és jobb keret
-        style.setAlignment(HorizontalAlignment.CENTER);
         return style;
     }
 

@@ -24,8 +24,6 @@ import java.util.stream.Collectors;
 public class ReportService {
     private final EmployeeService employeeService;
     private final WorkRecordService workRecordService;
-    private final SettingsService settingsService;
-
     private static final String REPORTS_DIRECTORY = "reports";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 

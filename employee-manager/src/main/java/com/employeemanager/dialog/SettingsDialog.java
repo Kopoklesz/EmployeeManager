@@ -116,7 +116,6 @@ public class SettingsDialog extends Dialog<Void> {
 
     private void testDatabaseConnection() {
         try {
-            // TODO: Implement database connection test
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Kapcsolat teszt");
             alert.setHeaderText(null);

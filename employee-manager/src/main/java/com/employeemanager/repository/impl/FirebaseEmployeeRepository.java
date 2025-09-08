@@ -5,7 +5,6 @@ import com.employeemanager.repository.interfaces.EmployeeRepository;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 import java.util.Optional;

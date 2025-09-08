@@ -6,12 +6,9 @@ import com.employeemanager.repository.interfaces.EmployeeRepository;
 import com.employeemanager.repository.interfaces.WorkRecordRepository;
 import com.employeemanager.util.FirebaseDateConverter;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QuerySnapshot;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -80,9 +77,6 @@ public class FirebaseWorkRecordRepository extends BaseFirebaseRepository<WorkRec
     public List<WorkRecord> findByEmployeeIdAndWorkDateBetween(String employeeId, LocalDate startDate, LocalDate endDate)
             throws ExecutionException, InterruptedException {
 
-        String startDateStr = FirebaseDateConverter.dateToString(startDate);
-        String endDateStr = FirebaseDateConverter.dateToString(endDate);
-
         try {
             // Először csak az employeeId alapján szűrünk, majd Java-ban szűrjük a dátumokat
             QuerySnapshot querySnapshot = firestore.collection(collectionName)
@@ -93,11 +87,10 @@ public class FirebaseWorkRecordRepository extends BaseFirebaseRepository<WorkRec
             return querySnapshot.getDocuments().stream()
                     .map(doc -> {
                         Map<String, Object> data = doc.getData();
-                        if (data != null) {
+                        {
                             data.put("id", doc.getId());
                             return convertFromMap(data);
                         }
-                        return null;
                     })
                     .filter(Objects::nonNull)
                     .filter(record -> {
@@ -140,11 +133,10 @@ public class FirebaseWorkRecordRepository extends BaseFirebaseRepository<WorkRec
             return querySnapshot.getDocuments().stream()
                     .map(doc -> {
                         Map<String, Object> data = doc.getData();
-                        if (data != null) {
+                        {
                             data.put("id", doc.getId());
                             return convertFromMap(data);
                         }
-                        return null;
                     })
                     .filter(Objects::nonNull)
                     .filter(record -> {
@@ -181,11 +173,10 @@ public class FirebaseWorkRecordRepository extends BaseFirebaseRepository<WorkRec
             return querySnapshot.getDocuments().stream()
                     .map(doc -> {
                         Map<String, Object> data = doc.getData();
-                        if (data != null) {
+                        {
                             data.put("id", doc.getId());
                             return convertFromMap(data);
                         }
-                        return null;
                     })
                     .filter(Objects::nonNull)
                     .filter(record -> {
@@ -222,11 +213,10 @@ public class FirebaseWorkRecordRepository extends BaseFirebaseRepository<WorkRec
             return querySnapshot.getDocuments().stream()
                     .map(doc -> {
                         Map<String, Object> data = doc.getData();
-                        if (data != null) {
+                        {
                             data.put("id", doc.getId());
                             return convertFromMap(data);
                         }
-                        return null;
                     })
                     .filter(Objects::nonNull)
                     .filter(record -> {

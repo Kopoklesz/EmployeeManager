@@ -399,6 +399,7 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
     private void updateButtonStates() {
         ConnectionConfig selected = connectionsList.getSelectionModel().getSelectedItem();
         boolean hasSelection = selected != null;
+        @SuppressWarnings("null")
         boolean isActive = hasSelection && selected.isActive();
 
         connectButton.setDisable(!hasSelection || isActive);

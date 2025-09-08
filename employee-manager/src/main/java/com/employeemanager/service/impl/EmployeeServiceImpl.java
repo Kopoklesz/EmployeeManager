@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -188,8 +187,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         try {
-            List<WorkRecord> savedRecords = new ArrayList<>();
-
             // Ellenőrizzük minden rekordnál az alkalmazottat
             for (WorkRecord record : workRecords) {
                 if (record.getEmployee() == null) {

@@ -55,6 +55,7 @@ public class DatabaseConnectionManager {
     /**
      * JDBC kapcsolat tesztelése - JAVÍTOTT VERZIÓ HikariCP-vel
      */
+    @SuppressWarnings("null")
     private boolean testJdbcConnection(ConnectionConfig config) {
         log.info("=== JDBC CONNECTION TEST WITH HIKARICP ===");
         log.info("Testing connection to: {}", config.getJdbcUrl());

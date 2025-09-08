@@ -1,12 +1,9 @@
 package com.employeemanager.service.impl;
 
 import com.employeemanager.database.factory.RepositoryFactory;
-import com.employeemanager.model.Employee;
 import com.employeemanager.model.WorkRecord;
-import com.employeemanager.repository.interfaces.EmployeeRepository;
 import com.employeemanager.repository.interfaces.WorkRecordRepository;
 import com.employeemanager.service.exception.ServiceException;
-import com.employeemanager.service.interfaces.EmployeeService;
 import com.employeemanager.service.interfaces.WorkRecordService;
 import com.employeemanager.util.ValidationHelper;
 import lombok.RequiredArgsConstructor;
