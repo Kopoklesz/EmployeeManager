@@ -2,7 +2,6 @@ package com.employeemanager.database.factory;
 
 import com.employeemanager.database.config.ConnectionConfig;
 import com.employeemanager.database.config.DatabaseConnectionManager;
-import com.employeemanager.database.config.DatabaseType;
 import com.employeemanager.database.schema.SchemaInitializerFactory;
 import com.employeemanager.repository.impl.FirebaseEmployeeRepository;
 import com.employeemanager.repository.impl.FirebaseWorkRecordRepository;

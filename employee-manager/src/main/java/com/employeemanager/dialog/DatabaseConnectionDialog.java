@@ -9,9 +9,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -78,40 +75,28 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
 
         DialogPane dialogPane = getDialogPane();
         dialogPane.getButtonTypes().addAll(ButtonType.CLOSE);
-        dialogPane.setPrefWidth(900);
-        dialogPane.setPrefHeight(700);
-
-        // Alkalmazz modern stílusokat
-        dialogPane.setStyle("""
-            -fx-background-color: #f8fafc;
-            -fx-background-radius: 12;
-            -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 20, 0.0, 0, 5);
-        """);
+        
+        // CSS fájl betöltése
+        dialogPane.getStylesheets().add(
+            getClass().getResource("/css/database-dialog.css").toExternalForm()
+        );
+        
+        // Dialog stílus alkalmazása
+        dialogPane.getStyleClass().add("db-dialog");
 
         mainTabPane = new TabPane();
         mainTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        mainTabPane.setStyle("""
-            -fx-background-color: transparent;
-            -fx-border-color: transparent;
-        """);
+        mainTabPane.getStyleClass().add("db-main-tabpane");
 
         // Tab 1: Mentett kapcsolatok
         Tab savedConnectionsTab = new Tab("📋 Mentett Kapcsolatok");
         savedConnectionsTab.setContent(createSavedConnectionsPane());
-        savedConnectionsTab.setStyle("""
-            -fx-background-color: #ffffff;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-        """);
+        savedConnectionsTab.getStyleClass().add("db-tab");
 
         // Tab 2: Új kapcsolat
         newConnectionTab = new Tab("➕ Új Kapcsolat");
         newConnectionTab.setContent(createNewConnectionPane());
-        newConnectionTab.setStyle("""
-            -fx-background-color: #ffffff;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-        """);
+        newConnectionTab.getStyleClass().add("db-tab");
 
         mainTabPane.getTabs().addAll(savedConnectionsTab, newConnectionTab);
         dialogPane.setContent(mainTabPane);
@@ -120,28 +105,20 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
     private VBox createSavedConnectionsPane() {
         VBox pane = new VBox(20);
         pane.setPadding(new Insets(25));
-        pane.setStyle("-fx-background-color: #ffffff;");
+        pane.getStyleClass().add("db-tab-content");
 
         // Header
         Label headerLabel = new Label("💾 Mentett Adatbázis Kapcsolatok");
-        headerLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
-        headerLabel.setTextFill(Color.web("#1e293b"));
+        headerLabel.getStyleClass().add("db-header-label");
 
         Label descLabel = new Label("Válassza ki a használni kívánt adatbázis kapcsolatot");
-        descLabel.setFont(Font.font("System", 14));
-        descLabel.setTextFill(Color.web("#64748b"));
+        descLabel.getStyleClass().add("db-description-label");
 
         // Kapcsolatok lista
         connectionsList = new ListView<>();
         connectionsList.setPrefHeight(350);
         connectionsList.setCellFactory(listView -> new ModernConnectionListCell());
-        connectionsList.setStyle("""
-            -fx-background-color: #f8fafc;
-            -fx-border-color: #e2e8f0;
-            -fx-border-width: 1;
-            -fx-border-radius: 8;
-            -fx-background-radius: 8;
-        """);
+        connectionsList.getStyleClass().add("db-connection-list");
 
         connectionsList.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldVal, newVal) -> updateButtonStates()
@@ -161,107 +138,17 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
 
         // Kapcsolódás gomb (zöld)
         connectButton = new Button("🔌 Kapcsolódás");
-        connectButton.setPrefWidth(160);
-        connectButton.setStyle("""
-            -fx-background-color: #22c55e;
-            -fx-text-fill: white;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-            -fx-padding: 12 20;
-            -fx-background-radius: 8;
-            -fx-cursor: hand;
-            -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.3), 8, 0.0, 0, 2);
-        """);
-        connectButton.setOnMouseEntered(e -> connectButton.setStyle("""
-            -fx-background-color: #16a34a;
-            -fx-text-fill: white;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-            -fx-padding: 12 20;
-            -fx-background-radius: 8;
-            -fx-cursor: hand;
-            -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.4), 10, 0.0, 0, 3);
-        """));
-        connectButton.setOnMouseExited(e -> connectButton.setStyle("""
-            -fx-background-color: #22c55e;
-            -fx-text-fill: white;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-            -fx-padding: 12 20;
-            -fx-background-radius: 8;
-            -fx-cursor: hand;
-            -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.3), 8, 0.0, 0, 2);
-        """));
+        connectButton.getStyleClass().add("db-button-primary");
         connectButton.setOnAction(e -> connectToSelected());
 
         // Szerkesztés gomb (kék)
         editButton = new Button("✏️ Szerkesztés");
-        editButton.setPrefWidth(160);
-        editButton.setStyle("""
-            -fx-background-color: #3b82f6;
-            -fx-text-fill: white;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-            -fx-padding: 12 20;
-            -fx-background-radius: 8;
-            -fx-cursor: hand;
-            -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 8, 0.0, 0, 2);
-        """);
-        editButton.setOnMouseEntered(e -> editButton.setStyle("""
-            -fx-background-color: #2563eb;
-            -fx-text-fill: white;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-            -fx-padding: 12 20;
-            -fx-background-radius: 8;
-            -fx-cursor: hand;
-            -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.4), 10, 0.0, 0, 3);
-        """));
-        editButton.setOnMouseExited(e -> editButton.setStyle("""
-            -fx-background-color: #3b82f6;
-            -fx-text-fill: white;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-            -fx-padding: 12 20;
-            -fx-background-radius: 8;
-            -fx-cursor: hand;
-            -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 8, 0.0, 0, 2);
-        """));
+        editButton.getStyleClass().add("db-button-secondary");
         editButton.setOnAction(e -> editSelected());
 
         // Törlés gomb (piros)
         deleteButton = new Button("🗑️ Törlés");
-        deleteButton.setPrefWidth(160);
-        deleteButton.setStyle("""
-            -fx-background-color: #ef4444;
-            -fx-text-fill: white;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-            -fx-padding: 12 20;
-            -fx-background-radius: 8;
-            -fx-cursor: hand;
-            -fx-effect: dropshadow(gaussian, rgba(239,68,68,0.3), 8, 0.0, 0, 2);
-        """);
-        deleteButton.setOnMouseEntered(e -> deleteButton.setStyle("""
-            -fx-background-color: #dc2626;
-            -fx-text-fill: white;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-            -fx-padding: 12 20;
-            -fx-background-radius: 8;
-            -fx-cursor: hand;
-            -fx-effect: dropshadow(gaussian, rgba(239,68,68,0.4), 10, 0.0, 0, 3);
-        """));
-        deleteButton.setOnMouseExited(e -> deleteButton.setStyle("""
-            -fx-background-color: #ef4444;
-            -fx-text-fill: white;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-            -fx-padding: 12 20;
-            -fx-background-radius: 8;
-            -fx-cursor: hand;
-            -fx-effect: dropshadow(gaussian, rgba(239,68,68,0.3), 8, 0.0, 0, 2);
-        """));
+        deleteButton.getStyleClass().add("db-button-danger");
         deleteButton.setOnAction(e -> deleteSelected());
 
         // Kezdetben letiltva
@@ -272,14 +159,16 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
     }
 
     private VBox createNewConnectionPane() {
-        VBox pane = new VBox(20);
-        pane.setPadding(new Insets(25));
-        pane.setStyle("-fx-background-color: #ffffff;");
+        VBox outerContainer = new VBox(20);
+        outerContainer.setPadding(new Insets(25));
+        outerContainer.getStyleClass().add("db-tab-content");
 
         // Header
         Label headerLabel = new Label("➕ Új Adatbázis Kapcsolat");
-        headerLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
-        headerLabel.setTextFill(Color.web("#1e293b"));
+        headerLabel.getStyleClass().add("db-header-label");
+
+        // Scrollable tartalom konténer
+        VBox scrollContent = new VBox(20);
 
         // Kapcsolat típusa
         VBox typeSection = createTypeSection();
@@ -293,34 +182,38 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
         // Akció gombok (új kapcsolathoz)
         HBox newConnectionButtons = createNewConnectionButtons();
 
-        pane.getChildren().addAll(headerLabel, typeSection, nameSection, connectionFormContainer, newConnectionButtons);
+        scrollContent.getChildren().addAll(typeSection, nameSection, connectionFormContainer, newConnectionButtons);
+
+        // ScrollPane wrapper a form tartalom körül
+        ScrollPane scrollPane = new ScrollPane(scrollContent);
+        scrollPane.getStyleClass().addAll("db-scroll-pane", "db-scroll-form", "db-scroll-container-form");
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+
+        outerContainer.getChildren().addAll(headerLabel, scrollPane);
 
         // Alapértelmezett típus beállítása
         typeComboBox.setValue(DatabaseType.FIREBASE);
         updateConnectionForm();
 
-        return pane;
+        return outerContainer;
     }
 
     private VBox createTypeSection() {
         VBox section = new VBox(8);
 
         Label label = new Label("🗄️ Adatbázis Típusa");
-        label.setFont(Font.font("System", FontWeight.BOLD, 14));
-        label.setTextFill(Color.web("#374151"));
+        label.getStyleClass().add("db-section-label");
 
         typeComboBox = new ComboBox<>();
-        typeComboBox.getItems().addAll(DatabaseType.values());
-        typeComboBox.setPrefWidth(300);
-        typeComboBox.setStyle("""
-            -fx-background-color: white;
-            -fx-border-color: #d1d5db;
-            -fx-border-width: 1;
-            -fx-border-radius: 6;
-            -fx-background-radius: 6;
-            -fx-padding: 10;
-            -fx-font-size: 14px;
-        """);
+        typeComboBox.getItems().addAll(
+                DatabaseType.FIREBASE,
+                DatabaseType.MYSQL,
+                DatabaseType.POSTGRESQL
+                // DatabaseType.H2 
+        );
+        typeComboBox.getStyleClass().add("db-combobox");
 
         // Szép megjelenítés a ComboBox elemekhez
         typeComboBox.setCellFactory(combo -> new ListCell<DatabaseType>() {
@@ -357,21 +250,11 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
         VBox section = new VBox(8);
 
         Label label = new Label("📝 Kapcsolat Neve");
-        label.setFont(Font.font("System", FontWeight.BOLD, 14));
-        label.setTextFill(Color.web("#374151"));
+        label.getStyleClass().add("db-section-label");
 
         nameField = new TextField();
         nameField.setPromptText("pl. Teszt szerver, Éles környezet...");
-        nameField.setPrefWidth(400);
-        nameField.setStyle("""
-            -fx-background-color: white;
-            -fx-border-color: #d1d5db;
-            -fx-border-width: 1;
-            -fx-border-radius: 6;
-            -fx-background-radius: 6;
-            -fx-padding: 10;
-            -fx-font-size: 14px;
-        """);
+        nameField.getStyleClass().add("db-input-name");
 
         section.getChildren().addAll(label, nameField);
         return section;
@@ -386,23 +269,16 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
         switch (selectedType) {
             case FIREBASE -> connectionFormContainer.getChildren().add(createFirebaseForm());
             case MYSQL, POSTGRESQL -> connectionFormContainer.getChildren().add(createSqlForm());
+            default -> throw new IllegalArgumentException("Unexpected value: " + selectedType);
         }
     }
 
     private VBox createFirebaseForm() {
         VBox form = new VBox(15);
-        form.setStyle("""
-            -fx-background-color: #fef3c7;
-            -fx-background-radius: 10;
-            -fx-padding: 20;
-            -fx-border-color: #f59e0b;
-            -fx-border-width: 1;
-            -fx-border-radius: 10;
-        """);
+        form.getStyleClass().add("db-form-firebase");
 
         Label headerLabel = new Label("🔥 Firebase Konfiguráció");
-        headerLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
-        headerLabel.setTextFill(Color.web("#92400e"));
+        headerLabel.getStyleClass().add("db-form-header-firebase");
 
         // Project ID
         VBox projectSection = createFieldSection("📋 Project ID",
@@ -421,18 +297,10 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
 
     private VBox createSqlForm() {
         VBox form = new VBox(15);
-        form.setStyle("""
-            -fx-background-color: #dbeafe;
-            -fx-background-radius: 10;
-            -fx-padding: 20;
-            -fx-border-color: #3b82f6;
-            -fx-border-width: 1;
-            -fx-border-radius: 10;
-        """);
+        form.getStyleClass().add("db-form-sql");
 
         Label headerLabel = new Label("🗄️ SQL Adatbázis Konfiguráció");
-        headerLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
-        headerLabel.setTextFill(Color.web("#1e40af"));
+        headerLabel.getStyleClass().add("db-form-header-sql");
 
         // Host és Port egy sorban
         HBox hostPortBox = new HBox(10);
@@ -440,7 +308,7 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
                 hostField = new TextField(), "localhost");
         VBox portSection = createFieldSection("🔌 Port",
                 portField = new TextField(), "3306/5432");
-        portField.setPrefWidth(100);
+        portField.getStyleClass().add("db-input-port");
         hostPortBox.getChildren().addAll(hostSection, portSection);
 
         // Database
@@ -471,19 +339,10 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
         VBox section = new VBox(5);
 
         Label label = new Label(labelText);
-        label.setFont(Font.font("System", FontWeight.BOLD, 12));
-        label.setTextFill(Color.web("#374151"));
+        label.getStyleClass().add("db-field-label");
 
         field.setPromptText(promptText);
-        field.setStyle("""
-            -fx-background-color: white;
-            -fx-border-color: #d1d5db;
-            -fx-border-width: 1;
-            -fx-border-radius: 6;
-            -fx-background-radius: 6;
-            -fx-padding: 8;
-            -fx-font-size: 13px;
-        """);
+        field.getStyleClass().add("db-input");
 
         section.getChildren().addAll(label, field);
         return section;
@@ -492,33 +351,16 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
     private VBox createFileSection() {
         VBox section = new VBox(5);
 
-        Label label = new Label("📁 Service Account JSON");
-        label.setFont(Font.font("System", FontWeight.BOLD, 12));
-        label.setTextFill(Color.web("#374151"));
+        Label label = new Label("📄 Service Account JSON");
+        label.getStyleClass().add("db-field-label");
 
         HBox fileBox = new HBox(10);
         serviceAccountField = new TextField();
         serviceAccountField.setPromptText("Válassza ki a JSON fájlt...");
-        serviceAccountField.setPrefWidth(300);
-        serviceAccountField.setStyle("""
-            -fx-background-color: white;
-            -fx-border-color: #d1d5db;
-            -fx-border-width: 1;
-            -fx-border-radius: 6;
-            -fx-background-radius: 6;
-            -fx-padding: 8;
-            -fx-font-size: 13px;
-        """);
+        serviceAccountField.getStyleClass().add("db-input-file");
 
         browseButton = new Button("📁 Tallózás");
-        browseButton.setStyle("""
-            -fx-background-color: #f59e0b;
-            -fx-text-fill: white;
-            -fx-font-weight: bold;
-            -fx-padding: 8 15;
-            -fx-background-radius: 6;
-            -fx-cursor: hand;
-        """);
+        browseButton.getStyleClass().add("db-button-browse");
         browseButton.setOnAction(e -> browseServiceAccount());
 
         fileBox.getChildren().addAll(serviceAccountField, browseButton);
@@ -533,32 +375,12 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
 
         // Teszt gomb
         Button testButton = new Button("🔍 Kapcsolat Tesztelése");
-        testButton.setPrefWidth(180);
-        testButton.setStyle("""
-            -fx-background-color: #8b5cf6;
-            -fx-text-fill: white;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-            -fx-padding: 12 20;
-            -fx-background-radius: 8;
-            -fx-cursor: hand;
-            -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 8, 0.0, 0, 2);
-        """);
+        testButton.getStyleClass().add("db-button-test");
         testButton.setOnAction(e -> testConnection());
 
         // Mentés gomb
         Button saveButton = new Button("💾 Mentés");
-        saveButton.setPrefWidth(180);
-        saveButton.setStyle("""
-            -fx-background-color: #22c55e;
-            -fx-text-fill: white;
-            -fx-font-size: 14px;
-            -fx-font-weight: bold;
-            -fx-padding: 12 20;
-            -fx-background-radius: 8;
-            -fx-cursor: hand;
-            -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.3), 8, 0.0, 0, 2);
-        """);
+        saveButton.getStyleClass().add("db-button-save");
         saveButton.setOnAction(e -> saveConnection());
 
         buttonBox.getChildren().addAll(testButton, saveButton);
@@ -636,26 +458,47 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
         editingConfig = selected;
         newConnectionTab.setText("✏️ Kapcsolat Szerkesztése");
 
-        // Mezők kitöltése
+        // Alapadatok kitöltése
         nameField.setText(selected.getName());
         typeComboBox.setValue(selected.getType());
 
-        switch (selected.getType()) {
-            case FIREBASE -> {
-                projectIdField.setText(selected.getFirebaseProjectId());
-                databaseUrlField.setText(selected.getFirebaseDatabaseUrl());
-                serviceAccountField.setText(selected.getFirebaseServiceAccountPath());
-            }
-            case MYSQL, POSTGRESQL -> {
-                hostField.setText(selected.getHost());
-                portField.setText(String.valueOf(selected.getPort()));
-                databaseField.setText(selected.getDatabase());
-                usernameField.setText(selected.getUsername());
-                passwordField.setText(selected.getPassword());
-            }
-        }
-
+        // Form frissítése a típus alapján (fontos: ez először történjen meg!)
         updateConnectionForm();
+
+        // Platform.runLater használata, hogy a mezők már létezzenek amikor kitöltjük őket
+        Platform.runLater(() -> {
+            switch (selected.getType()) {
+                case FIREBASE -> {
+                    if (projectIdField != null) {
+                        projectIdField.setText(selected.getFirebaseProjectId() != null ? selected.getFirebaseProjectId() : "");
+                    }
+                    if (databaseUrlField != null) {
+                        databaseUrlField.setText(selected.getFirebaseDatabaseUrl() != null ? selected.getFirebaseDatabaseUrl() : "");
+                    }
+                    if (serviceAccountField != null) {
+                        serviceAccountField.setText(selected.getFirebaseServiceAccountPath() != null ? selected.getFirebaseServiceAccountPath() : "");
+                    }
+                }
+                case MYSQL, POSTGRESQL -> {
+                    if (hostField != null) {
+                        hostField.setText(selected.getHost() != null ? selected.getHost() : "");
+                    }
+                    if (portField != null) {
+                        portField.setText(String.valueOf(selected.getPort()));
+                    }
+                    if (databaseField != null) {
+                        databaseField.setText(selected.getDatabase() != null ? selected.getDatabase() : "");
+                    }
+                    if (usernameField != null) {
+                        usernameField.setText(selected.getUsername() != null ? selected.getUsername() : "");
+                    }
+                    if (passwordField != null) {
+                        passwordField.setText(selected.getPassword() != null ? selected.getPassword() : "");
+                    }
+                }
+                default -> throw new IllegalArgumentException("Unexpected value: " + selected.getType());
+            }
+        });
     }
 
     private void deleteSelected() {
@@ -786,6 +629,7 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
                     return false;
                 }
             }
+            default -> throw new IllegalArgumentException("Unexpected value: " + type);
         }
 
         return true;
@@ -810,6 +654,7 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
                 config.setUsername(usernameField.getText().trim());
                 config.setPassword(passwordField.getText());
             }
+            default -> throw new IllegalArgumentException("Unexpected value: " + typeComboBox.getValue());
         }
 
         return config;
@@ -822,7 +667,7 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
         alert.getButtonTypes().clear();
 
         ProgressIndicator progressIndicator = new ProgressIndicator();
-        progressIndicator.setPrefSize(50, 50);
+        progressIndicator.getStyleClass().add("db-progress");
         alert.setGraphic(progressIndicator);
 
         return alert;
@@ -872,7 +717,7 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
             if (empty || item == null) {
                 setText(null);
                 setGraphic(null);
-                setStyle("-fx-background-color: transparent;");
+                getStyleClass().removeAll("db-connection-list");
             } else {
                 HBox container = new HBox(15);
                 container.setAlignment(Pos.CENTER_LEFT);
@@ -880,32 +725,23 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
 
                 // Ikon
                 Label iconLabel = new Label(getTypeIcon(item.getType()));
-                iconLabel.setFont(Font.font(20));
+                iconLabel.getStyleClass().add("db-list-cell-icon");
 
                 // Szöveg
                 VBox textBox = new VBox(2);
                 Label nameLabel = new Label(item.getName());
-                nameLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-                nameLabel.setTextFill(Color.web("#1e293b"));
+                nameLabel.getStyleClass().add("db-list-cell-name");
 
                 Label typeLabel = new Label(item.getType().getDisplayName());
-                typeLabel.setFont(Font.font(12));
-                typeLabel.setTextFill(Color.web("#64748b"));
+                typeLabel.getStyleClass().add("db-list-cell-type");
 
                 textBox.getChildren().addAll(nameLabel, typeLabel);
-
                 container.getChildren().addAll(iconLabel, textBox);
 
                 // Aktív státusz
                 if (item.isActive()) {
                     Label activeLabel = new Label("✅ AKTÍV");
-                    activeLabel.setFont(Font.font("System", FontWeight.BOLD, 11));
-                    activeLabel.setTextFill(Color.web("#22c55e"));
-                    activeLabel.setStyle("""
-                        -fx-background-color: #dcfce7;
-                        -fx-background-radius: 12;
-                        -fx-padding: 4 8;
-                    """);
+                    activeLabel.getStyleClass().add("db-active-badge");
 
                     Region spacer = new Region();
                     HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -914,31 +750,6 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
 
                 setGraphic(container);
                 setText(null);
-
-                // Hover effekt
-                setStyle("""
-                    -fx-background-color: #f8fafc;
-                    -fx-background-radius: 8;
-                    -fx-border-color: #e2e8f0;
-                    -fx-border-width: 1;
-                    -fx-border-radius: 8;
-                """);
-
-                setOnMouseEntered(e -> setStyle("""
-                    -fx-background-color: #f1f5f9;
-                    -fx-background-radius: 8;
-                    -fx-border-color: #3b82f6;
-                    -fx-border-width: 2;
-                    -fx-border-radius: 8;
-                """));
-
-                setOnMouseExited(e -> setStyle("""
-                    -fx-background-color: #f8fafc;
-                    -fx-background-radius: 8;
-                    -fx-border-color: #e2e8f0;
-                    -fx-border-width: 1;
-                    -fx-border-radius: 8;
-                """));
             }
         }
     }

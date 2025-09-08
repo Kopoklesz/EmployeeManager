@@ -1,0 +1,662 @@
+/* ==========================================
+   DATABASE CONNECTION DIALOG CSS
+   ========================================== */
+
+/* Dialog alapstílusok */
+.db-dialog {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 20, 0.0, 0, 5);
+    -fx-min-width: 900;
+    -fx-min-height: 700;
+    -fx-pref-width: 900;
+    -fx-pref-height: 700;
+}
+
+/* ==========================================
+   TAB PANE STÍLUSOK
+   ========================================== */
+
+.db-main-tabpane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.db-main-tabpane .tab-header-area {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 5 15 0 15;
+}
+
+.db-main-tabpane .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+/* Tab stílusok */
+.db-tab {
+    -fx-background-color: transparent;
+    -fx-text-fill: #64748b;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 15 25 15 25;
+    -fx-background-radius: 10 10 0 0;
+    -fx-border-radius: 10 10 0 0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.db-tab:hover {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #475569;
+}
+
+.db-tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #1e40af;
+    -fx-font-weight: bold;
+    -fx-border-color: #3b82f6 #3b82f6 transparent #3b82f6;
+    -fx-border-width: 3 3 0 3;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.2), 8, 0.0, 0, 2);
+}
+
+/* Selected tab hover - stabilizálva */
+.db-tab:selected:hover {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #1e40af;
+    -fx-font-weight: bold;
+    -fx-border-color: #3b82f6 #3b82f6 transparent #3b82f6;
+    -fx-border-width: 3 3 0 3;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 10, 0.0, 0, 2);
+}
+
+/* Tab tartalom */
+.db-tab-content {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 0 0 8 8;
+    -fx-padding: 25;
+}
+
+/* ==========================================
+   CÍMKE STÍLUSOK
+   ========================================== */
+
+.db-header-label {
+    -fx-font-family: "System";
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-text-fill: #1e293b;
+}
+
+.db-description-label {
+    -fx-font-family: "System";
+    -fx-font-size: 14px;
+    -fx-text-fill: #64748b;
+}
+
+.db-section-label {
+    -fx-font-family: "System";
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #374151;
+}
+
+.db-field-label {
+    -fx-font-family: "System";
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: #374151;
+}
+
+.db-form-header-firebase {
+    -fx-font-family: "System";
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-text-fill: #92400e;
+}
+
+.db-form-header-sql {
+    -fx-font-family: "System";
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-text-fill: #1e40af;
+}
+
+/* ==========================================
+   CONNECTION LISTA STÍLUSOK
+   ========================================== */
+
+.db-connection-list {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.db-connection-list .list-cell {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-padding: 8;
+    -fx-cell-size: 70;
+}
+
+.db-connection-list .list-cell:selected {
+    -fx-background-color: #dbeafe;
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 8, 0.0, 0, 2);
+}
+
+.db-connection-list .list-cell:hover {
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+}
+
+.db-connection-list .list-cell:hover:selected {
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: #93c5fd;
+    -fx-border-width: 2;
+}
+
+/* Lista cella komponensek */
+.db-list-cell-name {
+    -fx-font-family: "System";
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1e293b;
+}
+
+.db-list-cell-type {
+    -fx-font-family: "System";
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+}
+
+.db-list-cell-icon {
+    -fx-font-size: 20px;
+}
+
+.db-active-badge {
+    -fx-font-family: "System";
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-text-fill: #22c55e;
+    -fx-background-color: #dcfce7;
+    -fx-background-radius: 12;
+    -fx-padding: 4 8;
+}
+
+/* ==========================================
+   GOMB STÍLUSOK
+   ========================================== */
+
+/* Elsődleges gombok (zöld) */
+.db-button-primary {
+    -fx-background-color: #22c55e;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.3), 8, 0.0, 0, 2);
+    -fx-pref-width: 160;
+}
+
+.db-button-primary:hover {
+    -fx-background-color: #16a34a;
+    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.4), 10, 0.0, 0, 3);
+}
+
+.db-button-primary:pressed {
+    -fx-background-color: #15803d;
+}
+
+.db-button-primary:disabled {
+    -fx-background-color: #d1d5db;
+    -fx-text-fill: #9ca3af;
+    -fx-effect: none;
+    -fx-cursor: default;
+}
+
+/* Másodlagos gombok (kék) */
+.db-button-secondary {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 8, 0.0, 0, 2);
+    -fx-pref-width: 160;
+}
+
+.db-button-secondary:hover {
+    -fx-background-color: #2563eb;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.4), 10, 0.0, 0, 3);
+}
+
+.db-button-secondary:pressed {
+    -fx-background-color: #1d4ed8;
+}
+
+.db-button-secondary:disabled {
+    -fx-background-color: #d1d5db;
+    -fx-text-fill: #9ca3af;
+    -fx-effect: none;
+    -fx-cursor: default;
+}
+
+/* Veszélyes gombok (piros) */
+.db-button-danger {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(239,68,68,0.3), 8, 0.0, 0, 2);
+    -fx-pref-width: 160;
+}
+
+.db-button-danger:hover {
+    -fx-background-color: #dc2626;
+    -fx-effect: dropshadow(gaussian, rgba(239,68,68,0.4), 10, 0.0, 0, 3);
+}
+
+.db-button-danger:pressed {
+    -fx-background-color: #b91c1c;
+}
+
+.db-button-danger:disabled {
+    -fx-background-color: #d1d5db;
+    -fx-text-fill: #9ca3af;
+    -fx-effect: none;
+    -fx-cursor: default;
+}
+
+/* Teszt gombok (lila) */
+.db-button-test {
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 8, 0.0, 0, 2);
+    -fx-pref-width: 180;
+}
+
+.db-button-test:hover {
+    -fx-background-color: #7c3aed;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.4), 10, 0.0, 0, 3);
+}
+
+.db-button-test:pressed {
+    -fx-background-color: #6d28d9;
+}
+
+/* Tallózás gomb (narancs) */
+.db-button-browse {
+    -fx-background-color: #f59e0b;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 15;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.db-button-browse:hover {
+    -fx-background-color: #d97706;
+}
+
+.db-button-browse:pressed {
+    -fx-background-color: #b45309;
+}
+
+/* Mentés gomb (zöld, szélesebb) */
+.db-button-save {
+    -fx-background-color: #22c55e;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.3), 8, 0.0, 0, 2);
+    -fx-pref-width: 180;
+}
+
+.db-button-save:hover {
+    -fx-background-color: #16a34a;
+    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.4), 10, 0.0, 0, 3);
+}
+
+.db-button-save:pressed {
+    -fx-background-color: #15803d;
+}
+
+/* ==========================================
+   INPUT MEZŐK STÍLUSOK
+   ========================================== */
+
+.db-input {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 10;
+    -fx-font-size: 14px;
+    -fx-text-fill: #374151;
+}
+
+.db-input:focused {
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 4, 0.0, 0, 1);
+}
+
+.db-input-name {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 10;
+    -fx-font-size: 14px;
+    -fx-text-fill: #374151;
+    -fx-pref-width: 400;
+}
+
+.db-input-name:focused {
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 4, 0.0, 0, 1);
+}
+
+.db-input-file {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8;
+    -fx-font-size: 13px;
+    -fx-text-fill: #374151;
+    -fx-pref-width: 300;
+}
+
+.db-input-file:focused {
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 4, 0.0, 0, 1);
+}
+
+.db-input-port {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8;
+    -fx-font-size: 13px;
+    -fx-text-fill: #374151;
+    -fx-pref-width: 100;
+}
+
+.db-input-port:focused {
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 4, 0.0, 0, 1);
+}
+
+/* ==========================================
+   COMBOBOX STÍLUSOK
+   ========================================== */
+
+.db-combobox {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 10;
+    -fx-font-size: 14px;
+    -fx-pref-width: 300;
+}
+
+.db-combobox:focused {
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 4, 0.0, 0, 1);
+}
+
+.db-combobox .list-cell {
+    -fx-text-fill: #374151;
+    -fx-font-size: 14px;
+}
+
+/* ==========================================
+   FORM SECTION STÍLUSOK
+   ========================================== */
+
+.db-form-firebase {
+    -fx-background-color: #fef3c7;
+    -fx-background-radius: 10;
+    -fx-padding: 20;
+    -fx-border-color: #f59e0b;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+}
+
+.db-form-sql {
+    -fx-background-color: #dbeafe;
+    -fx-background-radius: 10;
+    -fx-padding: 20;
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+}
+
+/* Firebase form input mezők */
+.db-form-firebase .db-input {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8;
+    -fx-font-size: 13px;
+}
+
+.db-form-firebase .db-input:focused {
+    -fx-border-color: #f59e0b;
+    -fx-border-width: 2;
+}
+
+/* SQL form input mezők */
+.db-form-sql .db-input {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8;
+    -fx-font-size: 13px;
+}
+
+.db-form-sql .db-input:focused {
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+}
+
+/* ==========================================
+   PROGRESS INDICATOR
+   ========================================== */
+
+.db-progress {
+    -fx-pref-width: 50;
+    -fx-pref-height: 50;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+.db-dialog-content {
+    -fx-min-width: 900;
+    -fx-min-height: 700;
+    -fx-pref-width: 900;
+    -fx-pref-height: 700;
+}
+
+/* ==========================================
+   VALIDÁCIÓ STÍLUSOK
+   ========================================== */
+
+.db-input-error {
+    -fx-border-color: #ef4444;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(239,68,68,0.3), 4, 0.0, 0, 1);
+}
+
+.db-input-success {
+    -fx-border-color: #22c55e;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.3), 4, 0.0, 0, 1);
+}
+
+/* ==========================================
+   SCROLL PANE STÍLUSOK
+   ========================================== */
+
+.db-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.db-scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.db-scroll-pane .content {
+    -fx-background-color: transparent;
+}
+
+/* Scroll container a mentett kapcsolatok fülhöz */
+.db-scroll-connections {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-fit-to-width: true;
+    -fx-hbar-policy: never;
+    -fx-vbar-policy: as-needed;
+}
+
+.db-scroll-connections .viewport {
+    -fx-background-color: transparent;
+}
+
+.db-scroll-connections .content {
+    -fx-background-color: transparent;
+}
+
+/* Scroll container az új kapcsolat fülhöz */
+.db-scroll-form {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-fit-to-width: true;
+    -fx-hbar-policy: never;
+    -fx-vbar-policy: as-needed;
+}
+
+.db-scroll-form .viewport {
+    -fx-background-color: transparent;
+}
+
+.db-scroll-form .content {
+    -fx-background-color: transparent;
+}
+
+/* Scrollbar finomhangolás */
+.db-scroll-pane .scroll-bar:vertical,
+.db-scroll-connections .scroll-bar:vertical,
+.db-scroll-form .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 8;
+    -fx-pref-width: 12;
+}
+
+.db-scroll-pane .scroll-bar:vertical .track,
+.db-scroll-connections .scroll-bar:vertical .track,
+.db-scroll-form .scroll-bar:vertical .track {
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: transparent;
+    -fx-background-radius: 8;
+}
+
+.db-scroll-pane .scroll-bar:vertical .thumb,
+.db-scroll-connections .scroll-bar:vertical .thumb,
+.db-scroll-form .scroll-bar:vertical .thumb {
+    -fx-background-color: #cbd5e1;
+    -fx-border-color: transparent;
+    -fx-background-radius: 8;
+}
+
+.db-scroll-pane .scroll-bar:vertical .thumb:hover,
+.db-scroll-connections .scroll-bar:vertical .thumb:hover,
+.db-scroll-form .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #94a3b8;
+}
+
+.db-scroll-pane .scroll-bar:vertical .thumb:pressed,
+.db-scroll-connections .scroll-bar:vertical .thumb:pressed,
+.db-scroll-form .scroll-bar:vertical .thumb:pressed {
+    -fx-background-color: #64748b;
+}
+
+/* Scrollbar nyilak elrejtése */
+.db-scroll-pane .scroll-bar:vertical .increment-button,
+.db-scroll-pane .scroll-bar:vertical .decrement-button,
+.db-scroll-connections .scroll-bar:vertical .increment-button,
+.db-scroll-connections .scroll-bar:vertical .decrement-button,
+.db-scroll-form .scroll-bar:vertical .increment-button,
+.db-scroll-form .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+    -fx-min-height: 0;
+}
+
+/* Container magasság korlátozások */
+.db-scroll-container-connections {
+    -fx-max-height: 500;
+    max-height: 500px;
+    -fx-pref-height: 500;
+}
+
+.db-scroll-container-form {
+    -fx-max-height: 550;
+    -fx-pref-height: 550;
+}
