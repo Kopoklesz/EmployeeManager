@@ -3,7 +3,6 @@ package com.employeemanager.dialog;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebView;
 
 public class UserGuideDialog extends Dialog<Void> {
 

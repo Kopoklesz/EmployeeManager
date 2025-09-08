@@ -97,11 +97,10 @@ public abstract class BaseFirebaseRepository<T> implements BaseRepository<T, Str
         return querySnapshot.getDocuments().stream()
                 .map(doc -> {
                     Map<String, Object> data = doc.getData();
-                    if (data != null) {
+                    {
                         data.put("id", doc.getId()); // Ensure ID is included
                         return convertFromMap(data);
                     }
-                    return null;
                 })
                 .filter(entity -> entity != null)
                 .collect(Collectors.toList());

@@ -1,5 +1,6 @@
 package com.employeemanager.service.impl;
 
+import com.employeemanager.database.factory.RepositoryFactory;
 import com.employeemanager.model.Employee;
 import com.employeemanager.model.WorkRecord;
 import com.employeemanager.repository.interfaces.EmployeeRepository;
@@ -13,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -22,9 +22,28 @@ import java.util.concurrent.ExecutionException;
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
     private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
-    private final EmployeeRepository employeeRepository;
+
+    // VÁLTOZÁS: RepositoryFactory injektálása a statikus repository-k helyett
+    private final RepositoryFactory repositoryFactory;
     private final WorkRecordService workRecordService;
-    private final WorkRecordRepository workRecordRepository;
+
+    /**
+     * Dinamikus EmployeeRepository lekérése
+     */
+    private EmployeeRepository getEmployeeRepository() {
+        EmployeeRepository repo = repositoryFactory.getEmployeeRepository();
+        logger.debug("Using EmployeeRepository: {}", repo.getClass().getSimpleName());
+        return repo;
+    }
+
+    /**
+     * Dinamikus WorkRecordRepository lekérése
+     */
+    private WorkRecordRepository getWorkRecordRepository() {
+        WorkRecordRepository repo = repositoryFactory.getWorkRecordRepository();
+        logger.debug("Using WorkRecordRepository: {}", repo.getClass().getSimpleName());
+        return repo;
+    }
 
     @Override
     public Employee save(Employee employee) throws ServiceException {
@@ -36,19 +55,19 @@ public class EmployeeServiceImpl implements EmployeeService {
             // Ellenőrizzük a unique mezőket új alkalmazott esetén
             if (employee.getId() == null || employee.getId().isEmpty()) {
                 // Ellenőrizzük az adószámot
-                Optional<Employee> existingByTax = employeeRepository.findByTaxNumber(employee.getTaxNumber());
+                Optional<Employee> existingByTax = getEmployeeRepository().findByTaxNumber(employee.getTaxNumber());
                 if (existingByTax.isPresent()) {
                     throw new ServiceException("Az adószám már létezik a rendszerben");
                 }
 
                 // Ellenőrizzük a TAJ számot
-                Optional<Employee> existingBySSN = employeeRepository.findBySocialSecurityNumber(employee.getSocialSecurityNumber());
+                Optional<Employee> existingBySSN = getEmployeeRepository().findBySocialSecurityNumber(employee.getSocialSecurityNumber());
                 if (existingBySSN.isPresent()) {
                     throw new ServiceException("A TAJ szám már létezik a rendszerben");
                 }
             }
 
-            return employeeRepository.save(employee);
+            return getEmployeeRepository().save(employee);
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error saving employee", e);
             throw new ServiceException("Failed to save employee", e);
@@ -58,7 +77,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Optional<Employee> findById(String id) throws ServiceException {
         try {
-            return employeeRepository.findById(id);
+            return getEmployeeRepository().findById(id);
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error finding employee by id: " + id, e);
             throw new ServiceException("Failed to find employee", e);
@@ -68,7 +87,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<Employee> findAll() throws ServiceException {
         try {
-            return employeeRepository.findAll();
+            return getEmployeeRepository().findAll();
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error finding all employees", e);
             throw new ServiceException("Failed to find all employees", e);
@@ -87,7 +106,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                         employeeRecords.size() + " kapcsolódó munkanapló található");
             }
 
-            employeeRepository.deleteById(id);
+            getEmployeeRepository().deleteById(id);
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error deleting employee with id: " + id, e);
             throw new ServiceException("Failed to delete employee", e);
@@ -100,7 +119,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             if (employees.stream().anyMatch(e -> !validateEmployee(e))) {
                 throw new ServiceException("Invalid employee data in batch");
             }
-            return employeeRepository.saveAll(employees);
+            return getEmployeeRepository().saveAll(employees);
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error saving multiple employees", e);
             throw new ServiceException("Failed to save employees", e);
@@ -110,7 +129,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Optional<Employee> findByTaxNumber(String taxNumber) throws ServiceException {
         try {
-            return employeeRepository.findByTaxNumber(taxNumber);
+            return getEmployeeRepository().findByTaxNumber(taxNumber);
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error finding employee by tax number: " + taxNumber, e);
             throw new ServiceException("Failed to find employee by tax number", e);
@@ -120,7 +139,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Optional<Employee> findBySocialSecurityNumber(String ssn) throws ServiceException {
         try {
-            return employeeRepository.findBySocialSecurityNumber(ssn);
+            return getEmployeeRepository().findBySocialSecurityNumber(ssn);
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error finding employee by SSN: " + ssn, e);
             throw new ServiceException("Failed to find employee by SSN", e);
@@ -168,8 +187,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         try {
-            List<WorkRecord> savedRecords = new ArrayList<>();
-
             // Ellenőrizzük minden rekordnál az alkalmazottat
             for (WorkRecord record : workRecords) {
                 if (record.getEmployee() == null) {
@@ -213,7 +230,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<WorkRecord> getRecordsByNotificationDate(LocalDate startDate, LocalDate endDate) throws ServiceException {
         try {
-            return workRecordRepository.findByNotificationDateBetween(startDate, endDate);
+            return getWorkRecordRepository().findByNotificationDateBetween(startDate, endDate);
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error getting records by notification date", e);
             throw new ServiceException("Failed to get records by notification date", e);
@@ -224,7 +241,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<WorkRecord> getRecordsByBothDates(LocalDate notifStart, LocalDate notifEnd,
                                                   LocalDate workStart, LocalDate workEnd) throws ServiceException {
         try {
-            return workRecordRepository.findByNotificationDateAndWorkDateBetween(
+            return getWorkRecordRepository().findByNotificationDateAndWorkDateBetween(
                     notifStart, notifEnd, workStart, workEnd);
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error getting records by both dates", e);

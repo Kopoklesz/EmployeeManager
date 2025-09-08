@@ -101,8 +101,6 @@ public class ValidationHelper {
         }
     }
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
     public static boolean isValidWorkDate(LocalDate workDate) {
         return workDate != null && !workDate.isAfter(LocalDate.now());
     }

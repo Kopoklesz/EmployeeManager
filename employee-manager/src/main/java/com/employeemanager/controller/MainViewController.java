@@ -1,18 +1,6 @@
 package com.employeemanager.controller;
 
-import com.employeemanager.dialog.EmployeeDialog;
-import com.employeemanager.dialog.SettingsDialog;
-import com.employeemanager.dialog.UserGuideDialog;
-import com.employeemanager.dialog.WorkRecordDialog;
-import com.employeemanager.model.Employee;
-import com.employeemanager.model.WorkRecord;
-import com.employeemanager.model.fx.EmployeeFX;
-import com.employeemanager.model.fx.WorkRecordFX;
-import com.employeemanager.service.interfaces.EmployeeService;
-import com.employeemanager.service.impl.ReportService;
-import com.employeemanager.service.impl.SettingsService;
-import com.employeemanager.util.AlertHelper;
-import com.employeemanager.util.ExcelExporter;
+// JavaFX importok
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
@@ -20,9 +8,38 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+
+// Saját dialógusok
+import com.employeemanager.dialog.EmployeeDialog;
+// import com.employeemanager.dialog.SettingsDialog;
+import com.employeemanager.dialog.UserGuideDialog;
+import com.employeemanager.dialog.WorkRecordDialog;
+import com.employeemanager.dialog.DatabaseConnectionDialog;
+
+// Modellek
+import com.employeemanager.model.Employee;
+import com.employeemanager.model.WorkRecord;
+import com.employeemanager.model.fx.EmployeeFX;
+import com.employeemanager.model.fx.WorkRecordFX;
+
+// Service-ek
+import com.employeemanager.service.interfaces.EmployeeService;
+import com.employeemanager.service.impl.ReportService;
+import com.employeemanager.service.impl.SettingsService;
+import com.employeemanager.service.impl.DatabaseConnectionService;
+
+// Utility osztályok
+import com.employeemanager.util.AlertHelper;
+import com.employeemanager.util.ExcelExporter;
+import com.employeemanager.component.StatusBar;
+
+// Lombok
 import lombok.RequiredArgsConstructor;
+
+// Spring
 import org.springframework.stereotype.Controller;
 
+// Java standard library
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
@@ -32,16 +49,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-import com.employeemanager.component.StatusBar;
 
 @Controller
 @RequiredArgsConstructor
 public class MainViewController implements Initializable {
 
+    // Service réteg dependency injection
     private final EmployeeService employeeService;
     private final ReportService reportService;
     private final SettingsService settingsService;
     private final ExcelExporter excelExporter;
+    private final DatabaseConnectionService databaseConnectionService;
 
     // FXML injections for main TabPane
     @FXML private TabPane mainTabPane;
@@ -98,7 +116,17 @@ public class MainViewController implements Initializable {
         setupSearchField();
         setupDatePickers();
         loadInitialData();
-        updateStatus("Alkalmazás betöltve");
+        
+        // Kiírjuk az aktív adatbázis kapcsolatot a status barba
+        if (databaseConnectionService != null) {
+            databaseConnectionService.getActiveConnection().ifPresentOrElse(
+                conn -> updateStatus("Alkalmazás betöltve - Adatbázis: " + 
+                    conn.getName() + " (" + conn.getType() + ")"),
+                () -> updateStatus("Alkalmazás betöltve - Nincs aktív adatbázis kapcsolat")
+            );
+        } else {
+            updateStatus("Alkalmazás betöltve");
+        }
     }
 
     // ==========================================
@@ -203,15 +231,26 @@ public class MainViewController implements Initializable {
 
     @FXML
     private void showDatabaseSettings() {
-        // Placeholder implementation - később kerül implementálásra
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Fejlesztés alatt");
-        alert.setHeaderText("Adatbázis kapcsolat beállító");
-        alert.setContentText("Ez a funkció hamarosan elérhető lesz.\n\n" +
-                "Itt lehetőség lesz majd különböző adatbázisokhoz való csatlakozásra " +
-                "és a kapcsolat paramétereinek beállítására.");
-        alert.showAndWait();
-        updateStatus("Adatbázis beállítások - fejlesztés alatt");
+        try {
+            // ÚJ: Callback-kel nyitjuk meg a dialógust
+            Dialog<Void> dialog = new DatabaseConnectionDialog(databaseConnectionService, this::refreshAllData);
+            dialog.showAndWait();
+
+            // A meglévő loadInitialData() megtartjuk, mert:
+            // - A callback csak SIKERES aktiváláskor fut le
+            // - Ez minden dialog bezáráskor frissít (biztonság)
+            loadInitialData();
+
+            updateStatus("Adatbázis kapcsolat beállítások frissítve");
+
+        } catch (Exception e) {
+            AlertHelper.showError(
+                    "Hiba",
+                    "Nem sikerült megnyitni az adatbázis beállításokat",
+                    e.getMessage()
+            );
+            updateStatus("Hiba az adatbázis beállítások megnyitása közben");
+        }
     }
 
     @FXML
@@ -337,9 +376,8 @@ public class MainViewController implements Initializable {
             @Override
             protected void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
+                if (empty || item == null) setText(null);
+                else {
                     setText(item.format(DateTimeFormatter.ISO_LOCAL_DATE));
                 }
             }
@@ -399,20 +437,60 @@ public class MainViewController implements Initializable {
 
     private void loadInitialData() {
         try {
+            // Ellenőrizzük, hogy van-e aktív adatbázis kapcsolat
+            if (databaseConnectionService != null && 
+                databaseConnectionService.getActiveConnection().isEmpty()) {
+                
+                AlertHelper.showWarning(
+                    "Nincs adatbázis kapcsolat", 
+                    "Nincs aktív adatbázis kapcsolat beállítva. " +
+                    "Kérem állítson be egy kapcsolatot az Eszközök menüben."
+                );
+                updateStatus("Nincs aktív adatbázis kapcsolat");
+                
+                // Üres listákat állítunk be
+                filteredEmployees = new FilteredList<>(FXCollections.observableArrayList());
+                employeeTable.setItems(filteredEmployees);
+                workRecordTable.setItems(FXCollections.observableArrayList());
+                reportList.setItems(FXCollections.observableArrayList());
+                return;
+            }
+            
+            // Betöltjük az alkalmazottakat
             List<Employee> employees = employeeService.getAllEmployees();
             List<EmployeeFX> employeeFXList = employees.stream()
                     .map(EmployeeFX::new)
                     .collect(Collectors.toList());
 
-            filteredEmployees = new FilteredList<>(FXCollections.observableArrayList(employeeFXList));
+            filteredEmployees = new FilteredList<>(
+                FXCollections.observableArrayList(employeeFXList)
+            );
             employeeTable.setItems(filteredEmployees);
 
+            // Betöltjük a munkanaplókat és riportokat
             filterWorkRecords();
             loadReportList();
-            updateStatus("Adatok betöltve");
+            
+            // Frissítjük a status bart az aktív kapcsolat információval
+            if (databaseConnectionService != null) {
+                databaseConnectionService.getActiveConnection().ifPresent(conn -> 
+                    updateStatus("Adatok betöltve - Adatbázis: " + 
+                        conn.getName() + " (" + conn.getType() + ")")
+                );
+            }
+            
         } catch (Exception e) {
-            AlertHelper.showError("Hiba", "Nem sikerült betölteni az adatokat", e.getMessage());
-            updateStatus("Hiba az adatok betöltése közben");
+            AlertHelper.showError(
+                "Hiba", 
+                "Nem sikerült betölteni az adatokat", 
+                e.getMessage()
+            );
+            updateStatus("Hiba az adatok betöltése közben: " + e.getMessage());
+            
+            // Hiba esetén is üres listákat állítunk be
+            filteredEmployees = new FilteredList<>(FXCollections.observableArrayList());
+            employeeTable.setItems(filteredEmployees);
+            workRecordTable.setItems(FXCollections.observableArrayList());
         }
     }
 
@@ -721,6 +799,35 @@ public class MainViewController implements Initializable {
             } catch (Exception e) {
                 AlertHelper.showError("Hiba", "Nem sikerült törölni a riportot", e.getMessage());
             }
+        }
+    }
+
+    /**
+     * Újratölti az összes adatot az aktív adatbázis kapcsolatból
+     */
+    private void refreshAllData() {
+        try {
+            // Töröljük a jelenlegi kijelöléseket
+            employeeTable.getSelectionModel().clearSelection();
+            workRecordTable.getSelectionModel().clearSelection();
+            reportList.getSelectionModel().clearSelection();
+            
+            // Újratöltjük az adatokat
+            loadInitialData();
+            
+            // Értesítjük a felhasználót
+            updateStatus("Adatok frissítve: " + 
+                LocalDateTime.now().format(
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                )
+            );
+            
+        } catch (Exception e) {
+            AlertHelper.showError(
+                "Frissítési hiba", 
+                "Nem sikerült frissíteni az adatokat", 
+                e.getMessage()
+            );
         }
     }
 }
