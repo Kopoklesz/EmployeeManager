@@ -1,6 +1,7 @@
 package com.employeemanager.controller;
 
 // JavaFX importok
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
@@ -11,7 +12,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 // Saját dialógusok
 import com.employeemanager.dialog.EmployeeDialog;
-// import com.employeemanager.dialog.SettingsDialog;
 import com.employeemanager.dialog.UserGuideDialog;
 import com.employeemanager.dialog.WorkRecordDialog;
 import com.employeemanager.dialog.DatabaseConnectionDialog;
@@ -19,6 +19,7 @@ import com.employeemanager.dialog.DatabaseConnectionDialog;
 // Modellek
 import com.employeemanager.model.Employee;
 import com.employeemanager.model.WorkRecord;
+import com.employeemanager.model.WarningLevel;
 import com.employeemanager.model.fx.EmployeeFX;
 import com.employeemanager.model.fx.WorkRecordFX;
 
@@ -27,14 +28,20 @@ import com.employeemanager.service.interfaces.EmployeeService;
 import com.employeemanager.service.impl.ReportService;
 import com.employeemanager.service.impl.SettingsService;
 import com.employeemanager.service.impl.DatabaseConnectionService;
+import com.employeemanager.service.impl.WorkPatternAnalyzer;
+import com.employeemanager.service.exception.ServiceException;
 
 // Utility osztályok
 import com.employeemanager.util.AlertHelper;
 import com.employeemanager.util.ExcelExporter;
+
+// Komponensek
 import com.employeemanager.component.StatusBar;
+import com.employeemanager.component.WarningIndicator;
 
 // Lombok
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 // Spring
 import org.springframework.stereotype.Controller;
@@ -46,12 +53,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class MainViewController implements Initializable {
 
     // Service réteg dependency injection
@@ -60,6 +67,7 @@ public class MainViewController implements Initializable {
     private final SettingsService settingsService;
     private final ExcelExporter excelExporter;
     private final DatabaseConnectionService databaseConnectionService;
+    private final WorkPatternAnalyzer workPatternAnalyzer;
 
     // FXML injections for main TabPane
     @FXML private TabPane mainTabPane;
@@ -67,6 +75,7 @@ public class MainViewController implements Initializable {
     // FXML injections for employee table
     @FXML private TextField employeeSearchField;
     @FXML private TableView<EmployeeFX> employeeTable;
+    @FXML private TableColumn<EmployeeFX, WarningLevel> employeeWarningColumn;
     @FXML private TableColumn<EmployeeFX, String> idColumn;
     @FXML private TableColumn<EmployeeFX, String> nameColumn;
     @FXML private TableColumn<EmployeeFX, String> birthPlaceColumn;
@@ -116,6 +125,7 @@ public class MainViewController implements Initializable {
         setupSearchField();
         setupDatePickers();
         loadInitialData();
+        setupWarningColumn();
         
         // Kiírjuk az aktív adatbázis kapcsolatot a status barba
         if (databaseConnectionService != null) {
@@ -127,6 +137,8 @@ public class MainViewController implements Initializable {
         } else {
             updateStatus("Alkalmazás betöltve");
         }
+
+        Platform.runLater(() -> analyzeAllEmployeesWarnings());
     }
 
     // ==========================================
@@ -143,10 +155,43 @@ public class MainViewController implements Initializable {
 
     @FXML
     private void showAddWorkRecordDialog() {
-        if (isSafeToExecuteShortcut()) {
-            Dialog<List<WorkRecordFX>> dialog = new WorkRecordDialog(employeeService);
-            dialog.showAndWait().ifPresent(this::saveWorkRecords);
+        WorkRecordDialog dialog = new WorkRecordDialog(employeeService);
+        Optional<List<WorkRecordFX>> result = dialog.showAndWait();
+        
+        if (result.isPresent() && !result.get().isEmpty()) {
+            List<WorkRecordFX> newRecords = result.get();
+            Set<String> affectedEmployeeIds = new HashSet<>();
+            
+            for (WorkRecordFX recordFX : newRecords) {
+                try {
+                    WorkRecord record = recordFX.toWorkRecord();
+                    WorkRecord saved = employeeService.addWorkRecord(record);
+                    
+                    // Érintett alkalmazott ID-jének gyűjtése
+                    if (saved.getEmployee() != null) {
+                        affectedEmployeeIds.add(saved.getEmployee().getId());
+                    }
+                    
+                    recordFX.setId(saved.getId());
+                    workRecordTable.getItems().add(recordFX);
+                } catch (ServiceException e) {
+                    AlertHelper.showError("Hiba", "Nem sikerült menteni a munkanaplót: " + e.getMessage());
+                }
+            }
+            
+            // Érintett alkalmazottak figyelmeztetéseinek frissítése
+            for (String employeeId : affectedEmployeeIds) {
+                analyzeEmployeeWarnings(employeeId);
+            }
+            
+            updateSummary();
+            statusBar.showSuccess("Munkanapló(k) sikeresen hozzáadva");
         }
+    }
+
+    @FXML
+    private void exitApplication() {
+        Platform.exit();
     }
 
     // ==========================================
@@ -178,29 +223,100 @@ public class MainViewController implements Initializable {
 
     @FXML
     private void editSelectedWorkRecord() {
-        if (!isSafeToExecuteShortcut()) {
+        WorkRecordFX selected = workRecordTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            AlertHelper.showWarning("Nincs kiválasztva", "Kérem válasszon ki egy munkanaplót a szerkesztéshez!");
             return;
         }
-
-        WorkRecordFX selectedRecord = workRecordTable.getSelectionModel().getSelectedItem();
-
-        if (selectedRecord == null) {
-            // Nincs kijelölve munkanapló -> átváltás munkanaplók tab-ra
-            showWorkRecordTab();
-            updateStatus("Válasszon ki egy munkanaplót a szerkesztéshez");
-            AlertHelper.showInformation("Munkanapló szerkesztése",
-                    "Nincs kiválasztott munkanapló",
-                    "Kérem válasszon ki egy munkanaplót a táblázatból a szerkesztéshez.");
-            return;
-        }
-
-        // Van kijelölve munkanapló -> szerkesztő dialógus
-        Dialog<List<WorkRecordFX>> dialog = new WorkRecordDialog(employeeService, selectedRecord);
-        dialog.showAndWait().ifPresent(records -> {
-            if (records != null && !records.isEmpty()) {
-                saveWorkRecords(records);
+        
+        WorkRecordDialog dialog = new WorkRecordDialog(employeeService, selected);
+        Optional<List<WorkRecordFX>> result = dialog.showAndWait();
+        
+        if (result.isPresent() && !result.get().isEmpty()) {
+            WorkRecordFX edited = result.get().get(0);
+            String employeeId = null;
+            
+            try {
+                WorkRecord record = edited.toWorkRecord();
+                // employeeService használata a mentéshez
+                WorkRecord saved = employeeService.addWorkRecord(record);
+                
+                // Érintett alkalmazott ID-je
+                if (saved.getEmployee() != null) {
+                    employeeId = saved.getEmployee().getId();
+                }
+                
+                // Táblázat frissítése
+                int index = workRecordTable.getItems().indexOf(selected);
+                workRecordTable.getItems().set(index, new WorkRecordFX(saved));
+                
+                // Figyelmeztetések frissítése
+                if (employeeId != null) {
+                    analyzeEmployeeWarnings(employeeId);
+                }
+                
+                updateSummary();
+                statusBar.showSuccess("Munkanapló sikeresen módosítva");
+            } catch (ServiceException e) {
+                AlertHelper.showError("Hiba", "Nem sikerült módosítani a munkanaplót: " + e.getMessage());
             }
-        });
+        }
+    }
+
+    @FXML
+    private void deleteSelectedEmployee() {
+        EmployeeFX selectedEmployee = employeeTable.getSelectionModel().getSelectedItem();
+        if (selectedEmployee == null) {
+            AlertHelper.showWarning("Figyelmeztetés", "Nincs kiválasztott alkalmazott");
+            return;
+        }
+
+        if (AlertHelper.showConfirmation("Törlés megerősítése",
+                "Biztosan törli a kiválasztott alkalmazottat?",
+                "Ez a művelet nem vonható vissza.")) {
+            try {
+                employeeService.deleteEmployee(selectedEmployee.getId());
+                loadInitialData();
+                updateStatus("Alkalmazott törölve: " + selectedEmployee.getName());
+            } catch (Exception e) {
+                AlertHelper.showError("Hiba", "Nem sikerült törölni az alkalmazottat", e.getMessage());
+                updateStatus("Hiba az alkalmazott törlése közben");
+            }
+        }
+    }
+
+    @FXML
+    private void deleteSelectedWorkRecord() {
+        WorkRecordFX selected = workRecordTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            AlertHelper.showWarning("Nincs kiválasztva", "Kérem válasszon ki egy munkanaplót a törléshez!");
+            return;
+        }
+        
+        Optional<ButtonType> confirm = AlertHelper.showConfirmation(
+            "Törlés megerősítése",
+            "Biztosan törölni szeretné a kiválasztott munkanaplót?"
+        );
+        
+        if (confirm.isPresent() && confirm.get() == ButtonType.OK) {
+            String employeeId = selected.getEmployee() != null ? 
+                selected.getEmployee().getId() : null;
+            
+            try {
+                employeeService.deleteWorkRecord(selected.getId());
+                workRecordTable.getItems().remove(selected);
+                
+                // Figyelmeztetések frissítése
+                if (employeeId != null) {
+                    analyzeEmployeeWarnings(employeeId);
+                }
+                
+                updateSummary();
+                statusBar.showSuccess("Munkanapló sikeresen törölve");
+            } catch (ServiceException e) {
+                AlertHelper.showError("Hiba", "Nem sikerült törölni a munkanaplót: " + e.getMessage());
+            }
+        }
     }
 
     // ==========================================
@@ -280,7 +396,123 @@ public class MainViewController implements Initializable {
     }
 
     // ==========================================
-    // SEGÉD METÓDUSOK A BIZTONSÁGOS MŰKÖDÉSHEZ
+    // FIGYELMEZTETÉSI RENDSZER
+    // ==========================================
+
+    /**
+     * Figyelmeztetési oszlop beállítása
+     */
+    private void setupWarningColumn() {
+        employeeWarningColumn.setCellValueFactory(cellData -> 
+            cellData.getValue().warningLevelProperty()
+        );
+        
+        employeeWarningColumn.setCellFactory(column -> new TableCell<EmployeeFX, WarningLevel>() {
+            private final WarningIndicator warningIndicator = new WarningIndicator();
+            
+            @Override
+            protected void updateItem(WarningLevel level, boolean empty) {
+                super.updateItem(level, empty);
+                
+                if (empty || level == null) {
+                    setGraphic(null);
+                } else {
+                    EmployeeFX employee = getTableView().getItems().get(getIndex());
+                    warningIndicator.setWarning(level, employee.getWarningMessage());
+                    setGraphic(warningIndicator);
+                }
+            }
+        });
+        
+        employeeWarningColumn.setPrefWidth(50);
+        employeeWarningColumn.setResizable(false);
+        employeeWarningColumn.setStyle("-fx-alignment: CENTER;");
+    }
+
+    /**
+     * Összes alkalmazott figyelmeztetéseinek elemzése
+     */
+    @FXML
+    private void analyzeAllEmployeesWarnings() {
+        try {
+            log.info("Analyzing warnings for all employees...");
+            
+            // Összes alkalmazott lekérése
+            List<Employee> allEmployees = employeeService.findAll();
+            
+            // Elemzések futtatása
+            Map<String, WorkPatternAnalyzer.WarningAnalysis> analyses = 
+                workPatternAnalyzer.analyzeAllEmployees(allEmployees);
+            
+            // UI frissítése
+            Platform.runLater(() -> {
+                for (EmployeeFX employeeFX : employeeTable.getItems()) {
+                    WorkPatternAnalyzer.WarningAnalysis analysis = 
+                        analyses.get(employeeFX.getId());
+                    
+                    if (analysis != null) {
+                        employeeFX.setWarning(analysis.level, analysis.message);
+                    }
+                }
+                employeeTable.refresh();
+            });
+            
+            log.info("Warning analysis completed for {} employees", allEmployees.size());
+            
+        } catch (Exception e) {
+            log.error("Error analyzing employee warnings", e);
+        }
+    }
+
+    /**
+     * Egy alkalmazott figyelmeztetéseinek elemzése
+     */
+    private void analyzeEmployeeWarnings(String employeeId) {
+        try {
+            // Alkalmazott megkeresése
+            Optional<Employee> employeeOpt = employeeService.findById(employeeId);
+            if (employeeOpt.isEmpty()) {
+                return;
+            }
+            
+            Employee employee = employeeOpt.get();
+            
+            // Elemzés futtatása
+            WorkPatternAnalyzer.WarningAnalysis analysis = 
+                workPatternAnalyzer.analyzeEmployee(employee);
+            
+            // UI frissítése
+            Platform.runLater(() -> {
+                // Megkeressük az alkalmazottat a táblázatban
+                for (EmployeeFX employeeFX : employeeTable.getItems()) {
+                    if (employeeFX.getId().equals(employeeId)) {
+                        employeeFX.setWarning(analysis.level, analysis.message);
+                        employeeTable.refresh();
+                        break;
+                    }
+                }
+            });
+            
+            log.debug("Updated warnings for employee: {}", employee.getName());
+            
+        } catch (Exception e) {
+            log.error("Error analyzing warnings for employee: {}", employeeId, e);
+        }
+    }
+
+    @FXML
+    private void refreshEmployeeWarnings() {
+        EmployeeFX selected = employeeTable.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            analyzeEmployeeWarnings(selected.getId());
+            statusBar.showSuccess("Figyelmeztetések frissítve");
+        } else {
+            AlertHelper.showWarning("Nincs kiválasztva", "Kérem válasszon ki egy alkalmazottat!");
+        }
+    }
+
+    // ==========================================
+    // SEGÉD METÓDUSOK
     // ==========================================
 
     /**
@@ -299,9 +531,7 @@ public class MainViewController implements Initializable {
         return true;
     }
 
-    // ==========================================
-    // EREDETI METÓDUSOK - FRISSÍTVE
-    // ==========================================
+    // ... (a többi metódus ugyanaz marad, mint az eredeti fájlban)
 
     private void setupEmployeeTable() {
         // Column resize policy beállítása Java kódban
@@ -616,6 +846,9 @@ public class MainViewController implements Initializable {
         }
     }
 
+    /**
+     * Összesítés frissítése paraméterrel
+     */
     private void updateSummary(List<WorkRecordFX> records) {
         int totalHours = records.stream()
                 .mapToInt(WorkRecordFX::getHoursWorked)
@@ -627,6 +860,13 @@ public class MainViewController implements Initializable {
 
         totalHoursLabel.setText(String.format("%d óra", totalHours));
         totalPaymentLabel.setText(String.format("%,.0f Ft", totalPayment));
+    }
+
+    /**
+     * Összesítés frissítése paraméter nélkül - a táblázat aktuális tartalmából
+     */
+    private void updateSummary() {
+        updateSummary(workRecordTable.getItems());
     }
 
     @FXML

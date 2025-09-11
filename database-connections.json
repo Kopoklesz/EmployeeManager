@@ -1,0 +1,25 @@
+{
+  "connections" : {
+    "Firebase (Default)" : {
+      "name" : "Firebase (Default)",
+      "type" : "FIREBASE",
+      "host" : null,
+      "port" : null,
+      "database" : null,
+      "username" : null,
+      "password" : null,
+      "active" : true,
+      "firebaseProjectId" : "employee-manager-e70b6",
+      "firebaseDatabaseUrl" : "https://employee-manager-e70b6.firebaseio.com",
+      "firebaseServiceAccountPath" : "classpath:service-account.json",
+      "maxPoolSize" : 10,
+      "minIdle" : 2,
+      "connectionTimeout" : 30000,
+      "valid" : true,
+      "jdbcUrl" : null,
+      "driverClassName" : null,
+      "connectionProperties" : { }
+    }
+  },
+  "activeConnection" : "Firebase (Default)"
+}

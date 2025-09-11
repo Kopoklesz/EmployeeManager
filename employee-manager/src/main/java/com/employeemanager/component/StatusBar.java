@@ -1,8 +1,10 @@
 package com.employeemanager.component;
 
+import javafx.animation.PauseTransition;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.util.Duration;
 
 public class StatusBar extends HBox {
     private final Label label;
@@ -19,9 +21,36 @@ public class StatusBar extends HBox {
 
     public void setText(String text) {
         label.setText(text);
+        label.setStyle("");  // Reset style
     }
 
     public String getText() {
         return label.getText();
+    }
+
+    /**
+     * Sikeres művelet jelzése zöld háttérrel
+     */
+    public void showSuccess(String message) {
+        label.setText("✓ " + message);
+        label.setStyle("-fx-text-fill: #2e7d32; -fx-font-weight: bold;");
+        
+        // 3 másodperc után visszaállítjuk a normál stílust
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(e -> label.setStyle(""));
+        pause.play();
+    }
+    
+    /**
+     * Hiba jelzése piros háttérrel
+     */
+    public void showError(String message) {
+        label.setText("✗ " + message);
+        label.setStyle("-fx-text-fill: #c62828; -fx-font-weight: bold;");
+        
+        // 3 másodperc után visszaállítjuk a normál stílust
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(e -> label.setStyle(""));
+        pause.play();
     }
 }

@@ -1,0 +1,91 @@
+/* Figyelmeztető stílusok */
+/* Sárga figyelmeztetés */
+.warning-yellow {
+    -fx-text-fill: #FFA500; /* Narancssárga */
+    -fx-font-weight: bold;
+}
+
+.warning-yellow-bg {
+    -fx-background-color: #FFF8DC; /* Krémszín háttér */
+    -fx-background-radius: 15;
+    -fx-border-color: #FFA500;
+    -fx-border-width: 2;
+    -fx-border-radius: 15;
+}
+
+/* Piros figyelmeztetés */
+.warning-red {
+    -fx-text-fill: #DC143C; /* Crimson piros */
+    -fx-font-weight: bold;
+}
+
+.warning-red-bg {
+    -fx-background-color: #FFE4E1; /* Világos rózsaszín háttér */
+    -fx-background-radius: 15;
+    -fx-border-color: #DC143C;
+    -fx-border-width: 2;
+    -fx-border-radius: 15;
+}
+
+/* Tooltip stílusok */
+.warning-tooltip {
+    -fx-background-color: #2c3e50;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-padding: 8 12 8 12;
+    -fx-font-size: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0, 0, 2);
+}
+
+.warning-tooltip .tooltip-content {
+    -fx-padding: 5;
+}
+
+/* Táblázat cella hover effekt a figyelmeztetésekhez */
+.table-cell:hover .warning-yellow-bg {
+    -fx-background-color: #FFE4B5;
+    -fx-effect: dropshadow(gaussian, rgba(255,165,0,0.5), 5, 0, 0, 0);
+}
+
+.table-cell:hover .warning-red-bg {
+    -fx-background-color: #FFC0CB;
+    -fx-effect: dropshadow(gaussian, rgba(220,20,60,0.5), 5, 0, 0, 0);
+}
+
+/* Figyelmeztetési oszlop fejléc stílus */
+.table-view .column-header .warning-column {
+    -fx-alignment: CENTER;
+    -fx-font-size: 16px;
+}
+
+/* Animáció a kritikus figyelmeztetésekhez */
+@keyframes pulse-red {
+    0% {
+        -fx-opacity: 1.0;
+    }
+    50% {
+        -fx-opacity: 0.5;
+    }
+    100% {
+        -fx-opacity: 1.0;
+    }
+}
+
+.warning-red-bg {
+    -fx-animation: pulse-red 2s infinite;
+}
+
+/* Táblázat sor kiemelés figyelmeztetés esetén */
+.table-row-cell:selected .warning-yellow-bg,
+.table-row-cell:selected .warning-red-bg {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 10, 0, 0, 2);
+}
+
+/* Figyelmeztetés ikon méretezés */
+.warning-indicator {
+    -fx-min-width: 30;
+    -fx-max-width: 30;
+    -fx-min-height: 30;
+    -fx-max-height: 30;
+    -fx-alignment: CENTER;
+}
