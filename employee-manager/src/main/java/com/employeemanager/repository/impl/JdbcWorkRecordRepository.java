@@ -432,4 +432,33 @@ public class JdbcWorkRecordRepository implements WorkRecordRepository {
         
         return record;
     }
+
+    @Override
+    public void delete(String id) throws ExecutionException, InterruptedException {
+        deleteById(id);  // Meghívjuk a deleteById metódust
+    }
+
+    @Override
+    public List<WorkRecord> findAll() throws ExecutionException, InterruptedException {
+        String sql = "SELECT * FROM work_records ORDER BY work_date DESC";
+        
+        List<WorkRecord> workRecords = new ArrayList<>();
+        
+        try (Connection conn = dataSource.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    workRecords.add(mapResultSetToWorkRecord(rs));
+                }
+            }
+            
+            log.debug("Found {} work records", workRecords.size());
+            return workRecords;
+            
+        } catch (SQLException e) {
+            log.error("Error finding all work records", e);
+            throw new ExecutionException("Database error", e);
+        }
+    }
 }

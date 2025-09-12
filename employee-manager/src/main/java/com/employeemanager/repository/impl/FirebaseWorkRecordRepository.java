@@ -246,4 +246,14 @@ public class FirebaseWorkRecordRepository extends BaseFirebaseRepository<WorkRec
             throw new ExecutionException("Failed to fetch work records", e);
         }
     }
+
+    @Override
+    public void delete(String id) throws ExecutionException, InterruptedException {
+        deleteById(id);
+    }
+
+    @Override
+    public List<WorkRecord> findAll() throws ExecutionException, InterruptedException {
+        return getAll();
+    }
 }

@@ -1,6 +1,7 @@
 package com.employeemanager.service.impl;
 
 import com.employeemanager.database.factory.RepositoryFactory;
+import com.employeemanager.model.Employee;
 import com.employeemanager.model.WorkRecord;
 import com.employeemanager.repository.interfaces.WorkRecordRepository;
 import com.employeemanager.service.exception.ServiceException;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -119,5 +121,35 @@ public class WorkRecordServiceImpl implements WorkRecordService {
                 workRecord.getPayment().doubleValue() > 0 &&
                 ValidationHelper.isValidWorkHours(workRecord.getHoursWorked()) &&
                 ValidationHelper.isValidEbevSerial(workRecord.getEbevSerialNumber());
+    }
+
+    @Override
+    public List<WorkRecord> findByEmployee(Employee employee) throws ServiceException {
+        try {
+            if (employee == null || employee.getId() == null) {
+                throw new ServiceException("Invalid employee data");
+            }
+            
+            logger.debug("Finding work records for employee: {}", employee.getName());
+            
+            // Az aktuális repository implementáció használata
+            WorkRecordRepository repository = getWorkRecordRepository();
+            
+            // Összes munkanapló lekérése és szűrése az alkalmazott alapján
+            List<WorkRecord> allRecords = repository.findAll();
+            List<WorkRecord> employeeRecords = allRecords.stream()
+                .filter(record -> record.getEmployee() != null 
+                    && employee.getId().equals(record.getEmployee().getId()))
+                .collect(Collectors.toList());
+            
+            logger.debug("Found {} work records for employee {}", 
+                employeeRecords.size(), employee.getName());
+            
+            return employeeRecords;
+            
+        } catch (ExecutionException | InterruptedException e) {
+            logger.error("Error finding work records for employee: {}", employee.getName(), e);
+            throw new ServiceException("Failed to find work records", e);
+        }
     }
 }

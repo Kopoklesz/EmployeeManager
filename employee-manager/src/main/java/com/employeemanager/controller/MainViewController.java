@@ -175,7 +175,7 @@ public class MainViewController implements Initializable {
                     recordFX.setId(saved.getId());
                     workRecordTable.getItems().add(recordFX);
                 } catch (ServiceException e) {
-                    AlertHelper.showError("Hiba", "Nem sikerült menteni a munkanaplót: " + e.getMessage());
+                    AlertHelper.showError("Hiba", "Mentési hiba", "Nem sikerült menteni a munkanaplót: " + e.getMessage());
                 }
             }
             
@@ -258,7 +258,7 @@ public class MainViewController implements Initializable {
                 updateSummary();
                 statusBar.showSuccess("Munkanapló sikeresen módosítva");
             } catch (ServiceException e) {
-                AlertHelper.showError("Hiba", "Nem sikerült módosítani a munkanaplót: " + e.getMessage());
+                AlertHelper.showError("Hiba", "Módosítási hiba", "Nem sikerült módosítani a munkanaplót: " + e.getMessage());
             }
         }
     }
@@ -273,7 +273,7 @@ public class MainViewController implements Initializable {
 
         if (AlertHelper.showConfirmation("Törlés megerősítése",
                 "Biztosan törli a kiválasztott alkalmazottat?",
-                "Ez a művelet nem vonható vissza.")) {
+                "Ez a művelet nem vonható vissza.") != null) {
             try {
                 employeeService.deleteEmployee(selectedEmployee.getId());
                 loadInitialData();
@@ -295,8 +295,10 @@ public class MainViewController implements Initializable {
         
         Optional<ButtonType> confirm = AlertHelper.showConfirmation(
             "Törlés megerősítése",
+            "Törlés megerősítése",  // header hozzáadása
             "Biztosan törölni szeretné a kiválasztott munkanaplót?"
         );
+
         
         if (confirm.isPresent() && confirm.get() == ButtonType.OK) {
             String employeeId = selected.getEmployee() != null ? 
@@ -314,7 +316,7 @@ public class MainViewController implements Initializable {
                 updateSummary();
                 statusBar.showSuccess("Munkanapló sikeresen törölve");
             } catch (ServiceException e) {
-                AlertHelper.showError("Hiba", "Nem sikerült törölni a munkanaplót: " + e.getMessage());
+                AlertHelper.showError("Hiba", "Törlési hiba", "Nem sikerült törölni a munkanaplót: " + e.getMessage());
             }
         }
     }
@@ -773,7 +775,7 @@ public class MainViewController implements Initializable {
 
         if (AlertHelper.showConfirmation("Törlés megerősítése",
                 "Biztosan törli a kiválasztott alkalmazottat?",
-                "Ez a művelet nem vonható vissza.")) {
+                "Ez a művelet nem vonható vissza.") != null) {
             try {
                 employeeService.deleteEmployee(selectedEmployee.getId());
                 loadInitialData();
@@ -800,7 +802,7 @@ public class MainViewController implements Initializable {
 
         if (AlertHelper.showConfirmation("Törlés megerősítése",
                 "Biztosan törli a kiválasztott munkanaplót?",
-                "Ez a művelet nem vonható vissza.")) {
+                "Ez a művelet nem vonható vissza.") != null) {
             try {
                 employeeService.deleteWorkRecord(selectedRecord.getId());
                 filterWorkRecords();
@@ -1028,7 +1030,7 @@ public class MainViewController implements Initializable {
 
         if (AlertHelper.showConfirmation("Törlés megerősítése",
                 "Biztosan törli a kiválasztott riportot?",
-                "Ez a művelet nem vonható vissza.")) {
+                "Ez a művelet nem vonható vissza.") != null) {
             try {
                 // TODO: Implement report deletion logic
                 loadReportList();
