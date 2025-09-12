@@ -273,7 +273,7 @@ public class MainViewController implements Initializable {
 
         if (AlertHelper.showConfirmation("Törlés megerősítése",
                 "Biztosan törli a kiválasztott alkalmazottat?",
-                "Ez a művelet nem vonható vissza.") != null) {
+                "Ez a művelet nem vonható vissza.")) {
             try {
                 employeeService.deleteEmployee(selectedEmployee.getId());
                 loadInitialData();
@@ -293,14 +293,13 @@ public class MainViewController implements Initializable {
             return;
         }
         
-        Optional<ButtonType> confirm = AlertHelper.showConfirmation(
+        boolean confirm = AlertHelper.showConfirmation(
             "Törlés megerősítése",
-            "Törlés megerősítése",  // header hozzáadása
+            "Törlés megerősítése",
             "Biztosan törölni szeretné a kiválasztott munkanaplót?"
         );
 
-        
-        if (confirm.isPresent() && confirm.get() == ButtonType.OK) {
+        if (confirm) {
             String employeeId = selected.getEmployee() != null ? 
                 selected.getEmployee().getId() : null;
             
@@ -737,6 +736,7 @@ public class MainViewController implements Initializable {
         }
     }
 
+    /* 
     private void saveWorkRecords(List<WorkRecordFX> workRecordFXList) {
         if (workRecordFXList == null || workRecordFXList.isEmpty()) {
             return;
@@ -755,7 +755,7 @@ public class MainViewController implements Initializable {
             updateStatus("Hiba a munkanaplók mentése közben");
         }
     }
-
+    */
     // ==========================================
     // EREDETI CONTEXT MENU ÉS EGYÉB AKCIÓK
     // ==========================================
@@ -775,7 +775,7 @@ public class MainViewController implements Initializable {
 
         if (AlertHelper.showConfirmation("Törlés megerősítése",
                 "Biztosan törli a kiválasztott alkalmazottat?",
-                "Ez a művelet nem vonható vissza.") != null) {
+                "Ez a művelet nem vonható vissza.")) {
             try {
                 employeeService.deleteEmployee(selectedEmployee.getId());
                 loadInitialData();
@@ -802,7 +802,7 @@ public class MainViewController implements Initializable {
 
         if (AlertHelper.showConfirmation("Törlés megerősítése",
                 "Biztosan törli a kiválasztott munkanaplót?",
-                "Ez a művelet nem vonható vissza.") != null) {
+                "Ez a művelet nem vonható vissza.")) {
             try {
                 employeeService.deleteWorkRecord(selectedRecord.getId());
                 filterWorkRecords();
@@ -1030,7 +1030,7 @@ public class MainViewController implements Initializable {
 
         if (AlertHelper.showConfirmation("Törlés megerősítése",
                 "Biztosan törli a kiválasztott riportot?",
-                "Ez a művelet nem vonható vissza.") != null) {
+                "Ez a művelet nem vonható vissza.")) {
             try {
                 // TODO: Implement report deletion logic
                 loadReportList();
