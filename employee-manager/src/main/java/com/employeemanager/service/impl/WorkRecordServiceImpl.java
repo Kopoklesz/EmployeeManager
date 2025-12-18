@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class WorkRecordServiceImpl implements WorkRecordService {
     private static final Logger logger = LoggerFactory.getLogger(WorkRecordServiceImpl.class);
 
@@ -35,6 +37,7 @@ public class WorkRecordServiceImpl implements WorkRecordService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public WorkRecord save(WorkRecord workRecord) throws ServiceException {
         try {
             if (!validateWorkRecord(workRecord)) {
@@ -68,6 +71,7 @@ public class WorkRecordServiceImpl implements WorkRecordService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public void deleteById(String id) throws ServiceException {
         try {
             getWorkRecordRepository().deleteById(id);
@@ -78,6 +82,7 @@ public class WorkRecordServiceImpl implements WorkRecordService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public List<WorkRecord> saveAll(List<WorkRecord> records) throws ServiceException {
         try {
             if (records.stream().anyMatch(r -> !validateWorkRecord(r))) {

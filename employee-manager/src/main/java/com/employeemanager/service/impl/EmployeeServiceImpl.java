@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EmployeeServiceImpl implements EmployeeService {
     private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
@@ -47,6 +49,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public Employee save(Employee employee) throws ServiceException {
         try {
             if (!validateEmployee(employee)) {
@@ -96,6 +99,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public void deleteById(String id) throws ServiceException {
         try {
             // Ellenőrizzük, hogy vannak-e kapcsolódó munkanaplók
@@ -115,6 +119,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public List<Employee> saveAll(List<Employee> employees) throws ServiceException {
         try {
             if (employees.stream().anyMatch(e -> !validateEmployee(e))) {
@@ -157,6 +162,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public WorkRecord addWorkRecord(WorkRecord workRecord) throws ServiceException {
         if (workRecord == null || workRecord.getEmployee() == null) {
             throw new ServiceException("Invalid work record data");
@@ -182,6 +188,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public List<WorkRecord> addWorkRecords(List<WorkRecord> workRecords) throws ServiceException {
         if (workRecords == null || workRecords.isEmpty()) {
             throw new ServiceException("No work records to add");
@@ -224,6 +231,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public void deleteWorkRecord(String id) throws ServiceException {
         workRecordService.deleteById(id);
     }

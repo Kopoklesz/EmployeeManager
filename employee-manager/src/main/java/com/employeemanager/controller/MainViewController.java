@@ -736,26 +736,6 @@ public class MainViewController implements Initializable {
         }
     }
 
-    /* 
-    private void saveWorkRecords(List<WorkRecordFX> workRecordFXList) {
-        if (workRecordFXList == null || workRecordFXList.isEmpty()) {
-            return;
-        }
-
-        try {
-            List<WorkRecord> workRecords = workRecordFXList.stream()
-                    .map(WorkRecordFX::toWorkRecord)
-                    .collect(Collectors.toList());
-
-            List<WorkRecord> savedRecords = employeeService.addWorkRecords(workRecords);
-            filterWorkRecords();
-            updateStatus(savedRecords.size() + " munkanapló mentve");
-        } catch (Exception e) {
-            AlertHelper.showError("Hiba", "Nem sikerült menteni a munkanaplókat", e.getMessage());
-            updateStatus("Hiba a munkanaplók mentése közben");
-        }
-    }
-    */
     // ==========================================
     // EREDETI CONTEXT MENU ÉS EGYÉB AKCIÓK
     // ==========================================

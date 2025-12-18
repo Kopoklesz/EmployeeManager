@@ -2,6 +2,7 @@ package com.employeemanager.model;
 
 import com.employeemanager.util.FirebaseDateConverter;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,29 +22,42 @@ public class WorkRecord {
     @Id
     private String id; // Firebase ID-k String típusúak
 
+    @NotNull(message = "Az alkalmazott megadása kötelező")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
-    @Transient
+    @NotNull(message = "A bejelentés dátumának megadása kötelező")
+    @PastOrPresent(message = "A bejelentés dátuma nem lehet jövőbeli")
+    @Column(name = "notification_date", nullable = false)
     private LocalDate notificationDate;
 
-    @Transient
+    @Column(name = "notification_time")
     private LocalTime notificationTime;
 
+    @NotBlank(message = "Az EBEV sorozatszám megadása kötelező")
+    @Size(max = 100, message = "Az EBEV sorozatszám maximum 100 karakter lehet")
     @Column(name = "ebev_serial", nullable = false)
     private String ebevSerialNumber;
 
-    @Transient
+    @NotNull(message = "A munka dátumának megadása kötelező")
+    @PastOrPresent(message = "A munka dátuma nem lehet jövőbeli")
+    @Column(name = "work_date", nullable = false)
     private LocalDate workDate;
 
+    @NotNull(message = "A fizetés összegének megadása kötelező")
+    @DecimalMin(value = "0.01", message = "A fizetés összege pozitív szám kell legyen")
+    @Digits(integer = 8, fraction = 2, message = "A fizetés formátuma nem megfelelő")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal payment;
 
+    @NotNull(message = "A ledolgozott órák számának megadása kötelező")
+    @Min(value = 1, message = "Legalább 1 órát kell dolgozni")
+    @Max(value = 24, message = "Maximum 24 órát lehet dolgozni egy nap")
     @Column(name = "hours_worked", nullable = false)
     private Integer hoursWorked;
 
-    @Transient
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
