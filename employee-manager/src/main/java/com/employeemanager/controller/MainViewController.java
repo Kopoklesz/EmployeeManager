@@ -100,11 +100,14 @@ public class MainViewController implements Initializable {
     @FXML private TableColumn<WorkRecordFX, BigDecimal> paymentColumn;
     @FXML private TableColumn<WorkRecordFX, Integer> hoursWorkedColumn;
 
-    // Szűrési radio buttonok
-    @FXML private RadioButton filterByNotificationDate;
-    @FXML private RadioButton filterByWorkDate;
-    @FXML private RadioButton filterByBoth;
+    // Régi szűrési radio buttonok - már nincsenek használatban az FXML-ben
+    // @FXML private RadioButton filterByNotificationDate;
+    // @FXML private RadioButton filterByWorkDate;
+    // @FXML private RadioButton filterByBoth;
     @FXML private ToggleGroup filterGroup;
+
+    // Szűrés gomb
+    @FXML private Button filterButton;
 
     // FXML injections for report tab
     @FXML private DatePicker reportStartDate;
@@ -662,8 +665,8 @@ public class MainViewController implements Initializable {
         reportStartDate.setValue(now.withDayOfMonth(1));
         reportEndDate.setValue(now.withDayOfMonth(now.lengthOfMonth()));
 
-        // Bejelentés dátuma legyen az alapértelmezett szűrés
-        filterByNotificationDate.setSelected(true);
+        // Régi szűrési radio button már nincs - eltávolítva
+        // filterByNotificationDate.setSelected(true);
     }
 
     private void loadInitialData() {
@@ -814,6 +817,76 @@ public class MainViewController implements Initializable {
         }
     }
 
+    // ==========================================
+    // MUNKANAPLÓK SZŰRÉSI METÓDUSOK
+    // ==========================================
+
+    /**
+     * Aktuális hónap szűrése - automatikus
+     */
+    @FXML
+    private void filterCurrentMonth() {
+        LocalDate now = LocalDate.now();
+        LocalDate startOfMonth = now.withDayOfMonth(1);
+        LocalDate endOfMonth = now.withDayOfMonth(now.lengthOfMonth());
+
+        startDatePicker.setValue(startOfMonth);
+        endDatePicker.setValue(endOfMonth);
+
+        // Letiltjuk a dátumválasztókat és a szűrés gombot
+        startDatePicker.setDisable(true);
+        endDatePicker.setDisable(true);
+        filterButton.setDisable(true);
+
+        // Automatikusan végrehajtjuk a szűrést
+        filterWorkRecords();
+        updateStatus("Aktuális hónap megjelenítve");
+    }
+
+    /**
+     * Előző hónap szűrése - automatikus
+     */
+    @FXML
+    private void filterPreviousMonth() {
+        LocalDate now = LocalDate.now();
+        LocalDate previousMonth = now.minusMonths(1);
+        LocalDate startOfMonth = previousMonth.withDayOfMonth(1);
+        LocalDate endOfMonth = previousMonth.withDayOfMonth(previousMonth.lengthOfMonth());
+
+        startDatePicker.setValue(startOfMonth);
+        endDatePicker.setValue(endOfMonth);
+
+        // Letiltjuk a dátumválasztókat és a szűrés gombot
+        startDatePicker.setDisable(true);
+        endDatePicker.setDisable(true);
+        filterButton.setDisable(true);
+
+        // Automatikusan végrehajtjuk a szűrést
+        filterWorkRecords();
+        updateStatus("Előző hónap megjelenítve");
+    }
+
+    /**
+     * Egyéni időszak kiválasztása - manuális
+     */
+    @FXML
+    private void filterCustomPeriod() {
+        // Engedélyezzük a dátumválasztókat és a szűrés gombot
+        startDatePicker.setDisable(false);
+        endDatePicker.setDisable(false);
+        filterButton.setDisable(false);
+
+        updateStatus("Válasszon egyéni időszakot a szűréshez");
+    }
+
+    /**
+     * Egyéni időszak szerinti szűrés végrehajtása
+     */
+    @FXML
+    private void applyFilter() {
+        filterWorkRecords();
+    }
+
     @FXML
     private void filterWorkRecords() {
         LocalDate start = startDatePicker.getValue();
@@ -827,13 +900,9 @@ public class MainViewController implements Initializable {
         try {
             List<WorkRecord> workRecords;
 
-            if (filterByNotificationDate.isSelected()) {
-                workRecords = employeeService.getRecordsByNotificationDate(start, end);
-            } else if (filterByWorkDate.isSelected()) {
-                workRecords = employeeService.getMonthlyRecords(start, end);
-            } else { // Mindkettő
-                workRecords = employeeService.getRecordsByBothDates(start, end, start, end);
-            }
+            // Alapértelmezett szűrés: munka dátuma szerint
+            // Régi RadioButton-ok már nincsenek az FXML-ben
+            workRecords = employeeService.getMonthlyRecords(start, end);
 
             List<WorkRecordFX> workRecordFXList = workRecords.stream()
                     .map(WorkRecordFX::new)
