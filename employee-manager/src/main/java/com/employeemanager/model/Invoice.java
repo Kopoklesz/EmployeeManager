@@ -48,9 +48,10 @@ public class Invoice {
     @Column(name = "payment_date")
     private LocalDate paymentDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
     @Builder.Default
-    private String paymentMethod = "Átutalás";
+    private PaymentMethod paymentMethod = PaymentMethod.BANK_TRANSFER;
 
     private String currency;
 
@@ -86,6 +87,9 @@ public class Invoice {
     @Column(name = "nav_sent_at")
     private LocalDateTime navSentAt;
 
+    @Column(name = "external_invoice_id")
+    private String externalInvoiceId; // Szamlazz.hu vagy Billingo számla ID
+
     @Column(name = "is_reverse_charge")
     @Builder.Default
     private Boolean isReverseCharge = false;
@@ -120,6 +124,26 @@ public class Invoice {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    /**
+     * Fizetési módok
+     */
+    public enum PaymentMethod {
+        BANK_TRANSFER("Átutalás"),
+        CASH("Készpénz"),
+        CARD("Bankkártya"),
+        OTHER("Egyéb");
+
+        private final String displayName;
+
+        PaymentMethod(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
     }
 
     /**
@@ -212,8 +236,9 @@ public class Invoice {
         map.put("paymentDeadline", FirebaseDateConverter.dateToString(paymentDeadline));
         map.put("deliveryDate", FirebaseDateConverter.dateToString(deliveryDate));
         map.put("paymentDate", FirebaseDateConverter.dateToString(paymentDate));
-        map.put("paymentMethod", paymentMethod);
+        map.put("paymentMethod", paymentMethod != null ? paymentMethod.name() : PaymentMethod.BANK_TRANSFER.name());
         map.put("currency", currency);
+        map.put("externalInvoiceId", externalInvoiceId);
         map.put("exchangeRate", exchangeRate != null ? exchangeRate.toString() : "1.000000");
         map.put("netAmount", netAmount != null ? netAmount.toString() : "0");
         map.put("vatAmount", vatAmount != null ? vatAmount.toString() : "0");
@@ -243,8 +268,18 @@ public class Invoice {
         invoice.setPaymentDeadline(FirebaseDateConverter.stringToDate((String) map.get("paymentDeadline")));
         invoice.setDeliveryDate(FirebaseDateConverter.stringToDate((String) map.get("deliveryDate")));
         invoice.setPaymentDate(FirebaseDateConverter.stringToDate((String) map.get("paymentDate")));
-        invoice.setPaymentMethod((String) map.get("paymentMethod"));
+
+        String paymentMethodStr = (String) map.get("paymentMethod");
+        if (paymentMethodStr != null) {
+            try {
+                invoice.setPaymentMethod(PaymentMethod.valueOf(paymentMethodStr));
+            } catch (IllegalArgumentException e) {
+                invoice.setPaymentMethod(PaymentMethod.BANK_TRANSFER);
+            }
+        }
+
         invoice.setCurrency((String) map.get("currency"));
+        invoice.setExternalInvoiceId((String) map.get("externalInvoiceId"));
 
         String exchangeRateStr = (String) map.get("exchangeRate");
         if (exchangeRateStr != null && !exchangeRateStr.isEmpty()) {

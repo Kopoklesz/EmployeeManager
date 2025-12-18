@@ -142,6 +142,7 @@ public class H2SchemaInitializer implements SchemaInitializer {
                     is_sent_to_nav BOOLEAN DEFAULT FALSE,
                     nav_transaction_id VARCHAR(100),
                     nav_sent_at TIMESTAMP,
+                    external_invoice_id VARCHAR(100),
                     is_reverse_charge BOOLEAN DEFAULT FALSE,
                     is_cash_accounting BOOLEAN DEFAULT FALSE,
                     footer_text TEXT,
