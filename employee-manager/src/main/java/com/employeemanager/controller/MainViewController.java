@@ -100,10 +100,10 @@ public class MainViewController implements Initializable {
     @FXML private TableColumn<WorkRecordFX, BigDecimal> paymentColumn;
     @FXML private TableColumn<WorkRecordFX, Integer> hoursWorkedColumn;
 
-    // Szűrési radio buttonok
-    @FXML private RadioButton filterByNotificationDate;
-    @FXML private RadioButton filterByWorkDate;
-    @FXML private RadioButton filterByBoth;
+    // Régi szűrési radio buttonok - már nincsenek használatban az FXML-ben
+    // @FXML private RadioButton filterByNotificationDate;
+    // @FXML private RadioButton filterByWorkDate;
+    // @FXML private RadioButton filterByBoth;
     @FXML private ToggleGroup filterGroup;
 
     // Szűrés gomb
@@ -665,8 +665,8 @@ public class MainViewController implements Initializable {
         reportStartDate.setValue(now.withDayOfMonth(1));
         reportEndDate.setValue(now.withDayOfMonth(now.lengthOfMonth()));
 
-        // Bejelentés dátuma legyen az alapértelmezett szűrés
-        filterByNotificationDate.setSelected(true);
+        // Régi szűrési radio button már nincs - eltávolítva
+        // filterByNotificationDate.setSelected(true);
     }
 
     private void loadInitialData() {
@@ -900,13 +900,9 @@ public class MainViewController implements Initializable {
         try {
             List<WorkRecord> workRecords;
 
-            if (filterByNotificationDate.isSelected()) {
-                workRecords = employeeService.getRecordsByNotificationDate(start, end);
-            } else if (filterByWorkDate.isSelected()) {
-                workRecords = employeeService.getMonthlyRecords(start, end);
-            } else { // Mindkettő
-                workRecords = employeeService.getRecordsByBothDates(start, end, start, end);
-            }
+            // Alapértelmezett szűrés: munka dátuma szerint
+            // Régi RadioButton-ok már nincsenek az FXML-ben
+            workRecords = employeeService.getMonthlyRecords(start, end);
 
             List<WorkRecordFX> workRecordFXList = workRecords.stream()
                     .map(WorkRecordFX::new)
