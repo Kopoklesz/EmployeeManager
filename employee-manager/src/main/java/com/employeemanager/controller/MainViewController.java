@@ -106,6 +106,9 @@ public class MainViewController implements Initializable {
     @FXML private RadioButton filterByBoth;
     @FXML private ToggleGroup filterGroup;
 
+    // Szűrés gomb
+    @FXML private Button filterButton;
+
     // FXML injections for report tab
     @FXML private DatePicker reportStartDate;
     @FXML private DatePicker reportEndDate;
@@ -812,6 +815,76 @@ public class MainViewController implements Initializable {
                 updateStatus("Hiba a munkanapló törlése közben");
             }
         }
+    }
+
+    // ==========================================
+    // MUNKANAPLÓK SZŰRÉSI METÓDUSOK
+    // ==========================================
+
+    /**
+     * Aktuális hónap szűrése - automatikus
+     */
+    @FXML
+    private void filterCurrentMonth() {
+        LocalDate now = LocalDate.now();
+        LocalDate startOfMonth = now.withDayOfMonth(1);
+        LocalDate endOfMonth = now.withDayOfMonth(now.lengthOfMonth());
+
+        startDatePicker.setValue(startOfMonth);
+        endDatePicker.setValue(endOfMonth);
+
+        // Letiltjuk a dátumválasztókat és a szűrés gombot
+        startDatePicker.setDisable(true);
+        endDatePicker.setDisable(true);
+        filterButton.setDisable(true);
+
+        // Automatikusan végrehajtjuk a szűrést
+        filterWorkRecords();
+        updateStatus("Aktuális hónap megjelenítve");
+    }
+
+    /**
+     * Előző hónap szűrése - automatikus
+     */
+    @FXML
+    private void filterPreviousMonth() {
+        LocalDate now = LocalDate.now();
+        LocalDate previousMonth = now.minusMonths(1);
+        LocalDate startOfMonth = previousMonth.withDayOfMonth(1);
+        LocalDate endOfMonth = previousMonth.withDayOfMonth(previousMonth.lengthOfMonth());
+
+        startDatePicker.setValue(startOfMonth);
+        endDatePicker.setValue(endOfMonth);
+
+        // Letiltjuk a dátumválasztókat és a szűrés gombot
+        startDatePicker.setDisable(true);
+        endDatePicker.setDisable(true);
+        filterButton.setDisable(true);
+
+        // Automatikusan végrehajtjuk a szűrést
+        filterWorkRecords();
+        updateStatus("Előző hónap megjelenítve");
+    }
+
+    /**
+     * Egyéni időszak kiválasztása - manuális
+     */
+    @FXML
+    private void filterCustomPeriod() {
+        // Engedélyezzük a dátumválasztókat és a szűrés gombot
+        startDatePicker.setDisable(false);
+        endDatePicker.setDisable(false);
+        filterButton.setDisable(false);
+
+        updateStatus("Válasszon egyéni időszakot a szűréshez");
+    }
+
+    /**
+     * Egyéni időszak szerinti szűrés végrehajtása
+     */
+    @FXML
+    private void applyFilter() {
+        filterWorkRecords();
     }
 
     @FXML
