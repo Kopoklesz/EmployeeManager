@@ -1,5 +1,7 @@
 package com.employeemanager.repository.impl;
 
+import com.employeemanager.model.dto.Page;
+import com.employeemanager.model.dto.PageRequest;
 import com.employeemanager.repository.interfaces.BaseRepository;
 import com.google.cloud.firestore.*;
 import lombok.extern.slf4j.Slf4j;
@@ -113,6 +115,47 @@ public abstract class BaseFirebaseRepository<T> implements BaseRepository<T, Str
                 .delete()
                 .get();
         log.debug("Deleted entity with ID: {} from collection: {}", id, collectionName);
+    }
+
+    @Override
+    public Page<T> findAll(PageRequest pageRequest) throws ExecutionException, InterruptedException {
+        Query query = firestore.collection(collectionName);
+
+        // Rendezés
+        if (pageRequest.getSortBy() != null && !pageRequest.getSortBy().isEmpty()) {
+            Query.Direction direction = pageRequest.getSortDirection() == PageRequest.SortDirection.DESC
+                ? Query.Direction.DESCENDING
+                : Query.Direction.ASCENDING;
+            query = query.orderBy(pageRequest.getSortBy(), direction);
+        }
+
+        // Teljes elemszám lekérdezése
+        long totalElements = count();
+
+        // Lapozás
+        query = query.offset(pageRequest.getOffset()).limit(pageRequest.getPageSize());
+
+        QuerySnapshot querySnapshot = query.get().get();
+
+        List<T> content = querySnapshot.getDocuments().stream()
+            .map(doc -> {
+                Map<String, Object> data = doc.getData();
+                data.put("id", doc.getId());
+                return convertFromMap(data);
+            })
+            .filter(entity -> entity != null)
+            .collect(Collectors.toList());
+
+        log.debug("Fetched page {} with {} items from collection: {}",
+            pageRequest.getPageNumber(), content.size(), collectionName);
+
+        return Page.of(content, pageRequest, totalElements);
+    }
+
+    @Override
+    public long count() throws ExecutionException, InterruptedException {
+        QuerySnapshot querySnapshot = firestore.collection(collectionName).get().get();
+        return querySnapshot.size();
     }
 
     /**
