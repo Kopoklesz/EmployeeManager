@@ -2,6 +2,7 @@ package com.employeemanager.model;
 
 import com.employeemanager.util.FirebaseDateConverter;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
@@ -19,27 +20,37 @@ public class Employee {
     @Id
     private String id; // Firebase ID-k String típusúak
 
+    @NotBlank(message = "A név megadása kötelező")
+    @Size(min = 2, max = 200, message = "A név hossza 2 és 200 karakter között kell legyen")
     @Column(nullable = false)
     private String name;
 
+    @Size(max = 200, message = "A születési hely maximum 200 karakter lehet")
     @Column(name = "birth_place")
     private String birthPlace;
 
-    @Transient
+    @Past(message = "A születési dátum múltbeli dátum kell legyen")
+    @Column(name = "birth_date")
     private LocalDate birthDate;
 
+    @Size(max = 200, message = "Az anyja neve maximum 200 karakter lehet")
     @Column(name = "mother_name")
     private String motherName;
 
+    @NotBlank(message = "Az adószám megadása kötelező")
+    @Pattern(regexp = "\\d{10}", message = "Az adószám 10 számjegyből kell álljon")
     @Column(name = "tax_number", unique = true)
     private String taxNumber;
 
+    @NotBlank(message = "A TAJ szám megadása kötelező")
+    @Pattern(regexp = "\\d{9}", message = "A TAJ szám 9 számjegyből kell álljon")
     @Column(name = "social_security_number", unique = true)
     private String socialSecurityNumber;
 
+    @Size(max = 500, message = "A cím maximum 500 karakter lehet")
     private String address;
 
-    @Transient
+    @Column(name = "created_at", updatable = false)
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)

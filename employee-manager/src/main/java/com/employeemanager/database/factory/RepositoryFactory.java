@@ -19,17 +19,21 @@ import java.io.IOException;
 
 /**
  * Repository példányok létrehozása az aktív adatbázis kapcsolat alapján
+ *
+ * Thread-safe implementáció: synchronized metódusok és volatile mezők biztosítják
+ * a megfelelő szálbiztonságot többszálú környezetben.
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class RepositoryFactory {
-    
+
     private final DatabaseConnectionManager connectionManager;
-    
-    private EmployeeRepository currentEmployeeRepository;
-    private WorkRecordRepository currentWorkRecordRepository;
-    private String currentConnectionKey;
+
+    // Volatile mezők a láthatóság biztosítására több szál között
+    private volatile EmployeeRepository currentEmployeeRepository;
+    private volatile WorkRecordRepository currentWorkRecordRepository;
+    private volatile String currentConnectionKey;
     
     /**
      * EmployeeRepository létrehozása vagy visszaadása

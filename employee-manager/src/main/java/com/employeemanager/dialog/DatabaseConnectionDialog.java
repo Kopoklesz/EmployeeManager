@@ -114,9 +114,8 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
         Label descLabel = new Label("Válassza ki a használni kívánt adatbázis kapcsolatot");
         descLabel.getStyleClass().add("db-description-label");
 
-        // Kapcsolatok lista
+        // Kapcsolatok lista ScrollPane-ben
         connectionsList = new ListView<>();
-        connectionsList.setPrefHeight(350);
         connectionsList.setCellFactory(listView -> new ModernConnectionListCell());
         connectionsList.getStyleClass().add("db-connection-list");
 
@@ -124,10 +123,23 @@ public class DatabaseConnectionDialog extends Dialog<Void> {
                 (obs, oldVal, newVal) -> updateButtonStates()
         );
 
+        // ScrollPane a lista körül
+        ScrollPane scrollPane = new ScrollPane(connectionsList);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.getStyleClass().addAll("db-scroll-pane", "db-scroll-connections");
+        scrollPane.setPrefHeight(350);
+        scrollPane.setMaxHeight(350);
+
+        // A ScrollPane-nek kell növekednie, nem a ListView-nak
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
         // Akció gombok
         HBox buttonBox = createActionButtons();
 
-        pane.getChildren().addAll(headerLabel, descLabel, connectionsList, buttonBox);
+        pane.getChildren().addAll(headerLabel, descLabel, scrollPane, buttonBox);
         return pane;
     }
 
