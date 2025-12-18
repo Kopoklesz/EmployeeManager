@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.1</version>
+        <version>3.2.0</version>
     </parent>
 
     <groupId>com.employeemanager</groupId>
@@ -17,11 +17,12 @@
     <description>Modern Employee Management System with Invoicing</description>
 
     <properties>
-        <java.version>21</java.version>
-        <javafx.version>23.0.1</javafx.version>
-        <apache.poi.version>5.3.0</apache.poi.version>
-        <firebase-admin.version>9.4.1</firebase-admin.version>
-        <itext.version>8.0.5</itext.version>
+        <java.version>17</java.version>
+        <javafx.version>21.0.1</javafx.version>
+        <apache.poi.version>5.2.5</apache.poi.version>
+        <firebase-admin.version>9.2.0</firebase-admin.version>
+        <grpc.version>1.60.0</grpc.version>
+        <itext.version>7.2.5</itext.version>
         <nav-online-invoice.version>1.0.0</nav-online-invoice.version>
     </properties>
 
@@ -56,7 +57,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>6.6.4.Final</version>
+            <version>6.4.1.Final</version>
         </dependency>
 
         <!-- Jackson for date handling -->
@@ -71,6 +72,23 @@
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
             <version>${firebase-admin.version}</version>
+        </dependency>
+
+        <!-- gRPC for Firebase (explicit version to avoid conflicts) -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+            <version>${grpc.version}</version>
         </dependency>
 
         <!-- MySQL Driver -->
@@ -153,22 +171,12 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- PDF Generation - iText -->
+        <!-- PDF Generation - iText 7 -->
         <dependency>
             <groupId>com.itextpdf</groupId>
-            <artifactId>itext-core</artifactId>
+            <artifactId>itext7-core</artifactId>
             <version>${itext.version}</version>
             <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>layout</artifactId>
-            <version>${itext.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>kernel</artifactId>
-            <version>${itext.version}</version>
         </dependency>
 
         <!-- XML Processing for NAV -->
