@@ -69,6 +69,9 @@ public class InvoiceItem {
     @Builder.Default
     private BigDecimal discountAmount = BigDecimal.ZERO;
 
+    @Column(name = "vat_exemption_reason")
+    private String vatExemptionReason;
+
     private String notes;
 
     @Transient
@@ -160,6 +163,7 @@ public class InvoiceItem {
         map.put("grossAmount", grossAmount != null ? grossAmount.toString() : "0");
         map.put("discountPercent", discountPercent != null ? discountPercent.toString() : "0");
         map.put("discountAmount", discountAmount != null ? discountAmount.toString() : "0");
+        map.put("vatExemptionReason", vatExemptionReason);
         map.put("notes", notes);
         map.put("createdAt", FirebaseDateConverter.dateTimeToString(createdAt));
         return map;
@@ -220,6 +224,7 @@ public class InvoiceItem {
             item.setDiscountAmount(new BigDecimal(discountAmountStr));
         }
 
+        item.setVatExemptionReason((String) map.get("vatExemptionReason"));
         item.setNotes((String) map.get("notes"));
         item.setCreatedAt(FirebaseDateConverter.stringToDateTime((String) map.get("createdAt")));
 

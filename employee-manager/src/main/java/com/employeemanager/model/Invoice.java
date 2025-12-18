@@ -54,6 +54,10 @@ public class Invoice {
 
     private String currency;
 
+    @Column(name = "exchange_rate", precision = 12, scale = 6)
+    @Builder.Default
+    private BigDecimal exchangeRate = BigDecimal.ONE;
+
     @Column(name = "net_amount", precision = 12, scale = 2)
     private BigDecimal netAmount;
 
@@ -81,6 +85,14 @@ public class Invoice {
 
     @Column(name = "nav_sent_at")
     private LocalDateTime navSentAt;
+
+    @Column(name = "is_reverse_charge")
+    @Builder.Default
+    private Boolean isReverseCharge = false;
+
+    @Column(name = "is_cash_accounting")
+    @Builder.Default
+    private Boolean isCashAccounting = false;
 
     @Column(name = "footer_text", length = 1000)
     private String footerText;
@@ -202,6 +214,7 @@ public class Invoice {
         map.put("paymentDate", FirebaseDateConverter.dateToString(paymentDate));
         map.put("paymentMethod", paymentMethod);
         map.put("currency", currency);
+        map.put("exchangeRate", exchangeRate != null ? exchangeRate.toString() : "1.000000");
         map.put("netAmount", netAmount != null ? netAmount.toString() : "0");
         map.put("vatAmount", vatAmount != null ? vatAmount.toString() : "0");
         map.put("grossAmount", grossAmount != null ? grossAmount.toString() : "0");
@@ -210,6 +223,8 @@ public class Invoice {
         map.put("isSentToNav", isSentToNav);
         map.put("navTransactionId", navTransactionId);
         map.put("navSentAt", FirebaseDateConverter.dateTimeToString(navSentAt));
+        map.put("isReverseCharge", isReverseCharge);
+        map.put("isCashAccounting", isCashAccounting);
         map.put("footerText", footerText);
         map.put("notes", notes);
         map.put("createdAt", FirebaseDateConverter.dateTimeToString(createdAt));
@@ -230,6 +245,13 @@ public class Invoice {
         invoice.setPaymentDate(FirebaseDateConverter.stringToDate((String) map.get("paymentDate")));
         invoice.setPaymentMethod((String) map.get("paymentMethod"));
         invoice.setCurrency((String) map.get("currency"));
+
+        String exchangeRateStr = (String) map.get("exchangeRate");
+        if (exchangeRateStr != null && !exchangeRateStr.isEmpty()) {
+            invoice.setExchangeRate(new BigDecimal(exchangeRateStr));
+        } else {
+            invoice.setExchangeRate(BigDecimal.ONE);
+        }
 
         String netAmountStr = (String) map.get("netAmount");
         if (netAmountStr != null && !netAmountStr.isEmpty()) {
@@ -255,6 +277,8 @@ public class Invoice {
         invoice.setIsSentToNav((Boolean) map.getOrDefault("isSentToNav", false));
         invoice.setNavTransactionId((String) map.get("navTransactionId"));
         invoice.setNavSentAt(FirebaseDateConverter.stringToDateTime((String) map.get("navSentAt")));
+        invoice.setIsReverseCharge((Boolean) map.getOrDefault("isReverseCharge", false));
+        invoice.setIsCashAccounting((Boolean) map.getOrDefault("isCashAccounting", false));
         invoice.setFooterText((String) map.get("footerText"));
         invoice.setNotes((String) map.get("notes"));
         invoice.setCreatedAt(FirebaseDateConverter.stringToDateTime((String) map.get("createdAt")));

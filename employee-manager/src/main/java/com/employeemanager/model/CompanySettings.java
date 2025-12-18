@@ -100,6 +100,17 @@ public class CompanySettings {
     @Builder.Default
     private Double defaultVatRate = 27.0;
 
+    // Számlázó backend beállítások
+    @Column(name = "invoicing_backend")
+    @Builder.Default
+    private String invoicingBackend = "NAV_EXPORT";
+
+    @Column(name = "szamlazz_agent_key")
+    private String szamlazzAgentKey;
+
+    @Column(name = "billingo_api_key")
+    private String billingoApiKey;
+
     @Transient
     private LocalDateTime createdAt;
 
@@ -173,6 +184,9 @@ public class CompanySettings {
         map.put("defaultPaymentDeadlineDays", defaultPaymentDeadlineDays);
         map.put("defaultCurrency", defaultCurrency);
         map.put("defaultVatRate", defaultVatRate);
+        map.put("invoicingBackend", invoicingBackend);
+        map.put("szamlazzAgentKey", szamlazzAgentKey);
+        map.put("billingoApiKey", billingoApiKey);
         map.put("createdAt", FirebaseDateConverter.dateTimeToString(createdAt));
         map.put("updatedAt", FirebaseDateConverter.dateTimeToString(updatedAt));
         return map;
@@ -220,6 +234,10 @@ public class CompanySettings {
         if (vatRate instanceof Number) {
             settings.setDefaultVatRate(((Number) vatRate).doubleValue());
         }
+
+        settings.setInvoicingBackend((String) map.getOrDefault("invoicingBackend", "NAV_EXPORT"));
+        settings.setSzamlazzAgentKey((String) map.get("szamlazzAgentKey"));
+        settings.setBillingoApiKey((String) map.get("billingoApiKey"));
 
         settings.setCreatedAt(FirebaseDateConverter.stringToDateTime((String) map.get("createdAt")));
         settings.setUpdatedAt(FirebaseDateConverter.stringToDateTime((String) map.get("updatedAt")));
