@@ -170,18 +170,6 @@ public class EmployeeDialog extends Dialog<EmployeeFX> {
         result.setSocialSecurityNumber(socialSecurityField.getText());
         result.setAddress(addressField.getText());
 
-        if (employee.getId() == null) {
-            LocalDate now = LocalDate.now();
-            result.setCreatedAt(now);
-        } else {
-            result.setCreatedAt(employee.getCreatedAt());
-            /*
-            if (employee.getCreatedAtStr() != null) {
-                result.setCreatedAtStr(employee.getCreatedAtStr());
-            }
-            */
-        }
-
         return result;
     }
 }

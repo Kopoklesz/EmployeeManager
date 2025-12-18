@@ -4,8 +4,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.input.KeyCodeCombination?>
-
 <?import com.employeemanager.component.StatusBar?>
+<?import com.employeemanager.component.WarningIndicator?>
+
 <VBox spacing="0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.employeemanager.controller.MainViewController"
       styleClass="main-container">
@@ -28,6 +29,18 @@
                     <KeyCodeCombination alt="UP" code="M" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
+            <SeparatorMenuItem/>
+            <MenuItem text="Excel exportálás" onAction="#exportToExcel">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
+            <SeparatorMenuItem/>
+            <MenuItem text="Kilépés" onAction="#exitApplication">
+                <accelerator>
+                    <KeyCodeCombination alt="DOWN" code="F4" control="UP" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
         </Menu>
 
         <!-- Szerkesztés menü -->
@@ -42,6 +55,9 @@
                     <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
+            <SeparatorMenuItem/>
+            <MenuItem text="Alkalmazott törlése" onAction="#deleteSelectedEmployee"/>
+            <MenuItem text="Munkanapló törlése" onAction="#deleteSelectedWorkRecord"/>
         </Menu>
 
         <!-- Nézet menü -->
@@ -49,6 +65,8 @@
             <MenuItem text="Alkalmazottak" onAction="#showEmployeeTab"/>
             <MenuItem text="Munkanaplók" onAction="#showWorkRecordTab"/>
             <MenuItem text="Riportok" onAction="#showReportsTab"/>
+            <SeparatorMenuItem/>
+            <MenuItem text="Figyelmeztetések frissítése" onAction="#analyzeAllEmployeesWarnings"/>
         </Menu>
 
         <!-- Eszközök menü -->
@@ -81,6 +99,13 @@
 
                 <TableView fx:id="employeeTable" VBox.vgrow="ALWAYS" styleClass="main-table">
                     <columns>
+                        <!-- Figyelmeztetési oszlop -->
+                        <TableColumn fx:id="employeeWarningColumn" prefWidth="50" resizable="false">
+                            <graphic>
+                                <Label text="⚠" style="-fx-font-size: 16px; -fx-text-fill: #FFA500;" />
+                            </graphic>
+                        </TableColumn>
+                        
                         <TableColumn fx:id="idColumn" text="ID" styleClass="table-column-id"
                                      prefWidth="80" minWidth="80" maxWidth="80"/>
                         <TableColumn fx:id="nameColumn" text="Név" styleClass="table-column-name"
@@ -101,9 +126,11 @@
                     <contextMenu>
                         <ContextMenu styleClass="context-menu">
                             <items>
-                                <MenuItem text="Szerkesztés" onAction="#showEditEmployeeDialog"/>
-                                <MenuItem text="Törlés" onAction="#deleteEmployee"/>
+                                <MenuItem text="Szerkesztés" onAction="#editSelectedEmployee"/>
+                                <MenuItem text="Törlés" onAction="#deleteSelectedEmployee"/>
                                 <MenuItem text="Munkanapló megtekintése" onAction="#showEmployeeWorkRecords"/>
+                                <SeparatorMenuItem/>
+                                <MenuItem text="Figyelmeztetések frissítése" onAction="#refreshEmployeeWarnings"/>
                             </items>
                         </ContextMenu>
                     </contextMenu>
@@ -122,21 +149,24 @@
                     <!-- Szűrési opciók -->
                     <HBox spacing="15" alignment="CENTER_LEFT" styleClass="filter-toolbar">
                         <Label text="Szűrés:" styleClass="toolbar-label"/>
-                        <RadioButton fx:id="filterByNotificationDate" text="Bejelentés dátuma" toggleGroup="$filterGroup" selected="true"/>
-                        <RadioButton fx:id="filterByWorkDate" text="Munkanap" toggleGroup="$filterGroup"/>
-                        <RadioButton fx:id="filterByBoth" text="Mindkettő" toggleGroup="$filterGroup"/>
+                        <RadioButton text="Aktuális hónap" selected="true" toggleGroup="$filterGroup"
+                                     onAction="#filterCurrentMonth" styleClass="filter-radio"/>
+                        <RadioButton text="Előző hónap" toggleGroup="$filterGroup"
+                                     onAction="#filterPreviousMonth" styleClass="filter-radio"/>
+                        <RadioButton text="Egyéni időszak" toggleGroup="$filterGroup"
+                                     onAction="#filterCustomPeriod" styleClass="filter-radio"/>
+                        <DatePicker fx:id="startDatePicker" promptText="Kezdő dátum" disable="true"
+                                    styleClass="date-picker"/>
+                        <DatePicker fx:id="endDatePicker" promptText="Záró dátum" disable="true"
+                                    styleClass="date-picker"/>
+                        <Button text="Szűrés" onAction="#applyFilter" disable="true"
+                                styleClass="primary-button" fx:id="filterButton"/>
                     </HBox>
 
-                    <!-- Dátum szűrők és gombok -->
-                    <HBox spacing="15" alignment="CENTER_LEFT" styleClass="filter-toolbar">
-                        <Label text="Időszak:" styleClass="toolbar-label"/>
-                        <DatePicker fx:id="startDatePicker" styleClass="date-picker"/>
-                        <Label text="-" styleClass="toolbar-separator"/>
-                        <DatePicker fx:id="endDatePicker" styleClass="date-picker"/>
-                        <Button text="Szűrés" onAction="#filterWorkRecords" styleClass="primary-button"/>
-                        <Region HBox.hgrow="ALWAYS"/>
+                    <HBox spacing="15" alignment="CENTER_LEFT" styleClass="action-toolbar">
                         <Button text="Új munkanapló" onAction="#showAddWorkRecordDialog" styleClass="accent-button"/>
-                        <Button text="Exportálás" onAction="#exportToExcel" styleClass="secondary-button"/>
+                        <Button text="Szerkesztés" onAction="#editSelectedWorkRecord" styleClass="primary-button"/>
+                        <Button text="Törlés" onAction="#deleteSelectedWorkRecord" styleClass="danger-button"/>
                     </HBox>
                 </VBox>
 
@@ -148,7 +178,7 @@
                                      prefWidth="150" minWidth="120"/>
                         <TableColumn fx:id="notificationDateColumn" text="Bejelentés dátuma" styleClass="table-column-date"
                                      prefWidth="130" minWidth="110"/>
-                        <TableColumn fx:id="notificationTimeColumn" text="Bejelentés ideje" styleClass="table-column-date"
+                        <TableColumn fx:id="notificationTimeColumn" text="Bejelentés ideje" styleClass="table-column-time"
                                      prefWidth="110" minWidth="100"/>
                         <TableColumn fx:id="ebevSerialColumn" text="EBEV azonosító" styleClass="table-column-number"
                                      prefWidth="120" minWidth="100"/>
@@ -162,8 +192,8 @@
                     <contextMenu>
                         <ContextMenu styleClass="context-menu">
                             <items>
-                                <MenuItem text="Szerkesztés" onAction="#showEditWorkRecordDialog"/>
-                                <MenuItem text="Törlés" onAction="#deleteWorkRecord"/>
+                                <MenuItem text="Szerkesztés" onAction="#editSelectedWorkRecord"/>
+                                <MenuItem text="Törlés" onAction="#deleteSelectedWorkRecord"/>
                             </items>
                         </ContextMenu>
                     </contextMenu>

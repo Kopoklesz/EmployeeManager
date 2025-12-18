@@ -1,6 +1,8 @@
 package com.employeemanager.repository.impl;
 
 import com.employeemanager.model.Employee;
+import com.employeemanager.model.dto.Page;
+import com.employeemanager.model.dto.PageRequest;
 import com.employeemanager.repository.interfaces.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -270,6 +272,62 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
         }
     }
     
+    @Override
+    public Page<Employee> findAll(PageRequest pageRequest) throws ExecutionException, InterruptedException {
+        // Először lekérdezzük az összes elem számát
+        long totalElements = count();
+
+        // Rendezés meghatározása
+        String sortBy = pageRequest.getSortBy() != null ? pageRequest.getSortBy() : "name";
+        String direction = pageRequest.getSortDirection() == PageRequest.SortDirection.DESC ? "DESC" : "ASC";
+
+        String sql = String.format(
+            "SELECT * FROM employees ORDER BY %s %s LIMIT ? OFFSET ?",
+            sortBy, direction
+        );
+
+        List<Employee> employees = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, pageRequest.getPageSize());
+            ps.setInt(2, pageRequest.getOffset());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    employees.add(mapResultSetToEmployee(rs));
+                }
+            }
+
+            log.debug("Fetched page {} with {} employees", pageRequest.getPageNumber(), employees.size());
+            return Page.of(employees, pageRequest, totalElements);
+
+        } catch (SQLException e) {
+            log.error("Error finding employees with pagination", e);
+            throw new ExecutionException("Database error", e);
+        }
+    }
+
+    @Override
+    public long count() throws ExecutionException, InterruptedException {
+        String sql = "SELECT COUNT(*) FROM employees";
+
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            if (rs.next()) {
+                return rs.getLong(1);
+            }
+            return 0;
+
+        } catch (SQLException e) {
+            log.error("Error counting employees", e);
+            throw new ExecutionException("Database error", e);
+        }
+    }
+
     /**
      * ResultSet-ből Employee objektum létrehozása
      */
@@ -278,22 +336,22 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
         employee.setId(rs.getString("id"));
         employee.setName(rs.getString("name"));
         employee.setBirthPlace(rs.getString("birth_place"));
-        
+
         Date birthDate = rs.getDate("birth_date");
         if (birthDate != null) {
             employee.setBirthDate(birthDate.toLocalDate());
         }
-        
+
         employee.setMotherName(rs.getString("mother_name"));
         employee.setTaxNumber(rs.getString("tax_number"));
         employee.setSocialSecurityNumber(rs.getString("social_security_number"));
         employee.setAddress(rs.getString("address"));
-        
+
         Timestamp createdAt = rs.getTimestamp("created_at");
         if (createdAt != null) {
             employee.setCreatedAt(createdAt.toLocalDateTime().toLocalDate());
         }
-        
+
         return employee;
     }
 }
