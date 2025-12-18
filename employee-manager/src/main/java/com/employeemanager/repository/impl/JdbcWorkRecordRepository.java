@@ -2,6 +2,8 @@ package com.employeemanager.repository.impl;
 
 import com.employeemanager.model.Employee;
 import com.employeemanager.model.WorkRecord;
+import com.employeemanager.model.dto.Page;
+import com.employeemanager.model.dto.PageRequest;
 import com.employeemanager.repository.interfaces.EmployeeRepository;
 import com.employeemanager.repository.interfaces.WorkRecordRepository;
 import lombok.RequiredArgsConstructor;
@@ -430,5 +432,66 @@ public class JdbcWorkRecordRepository implements WorkRecordRepository {
     @Override
     public void delete(String id) throws ExecutionException, InterruptedException {
         deleteById(id);  // Meghívjuk a deleteById metódust
+    }
+
+    @Override
+    public Page<WorkRecord> findAll(PageRequest pageRequest) throws ExecutionException, InterruptedException {
+        // Először lekérdezzük az összes elem számát
+        long totalElements = count();
+
+        // Rendezés meghatározása
+        String sortBy = pageRequest.getSortBy() != null ? pageRequest.getSortBy() : "work_date";
+        String direction = pageRequest.getSortDirection() == PageRequest.SortDirection.DESC ? "DESC" : "ASC";
+
+        String sql = String.format(
+            """
+            SELECT wr.*, e.name as employee_name, e.social_security_number
+            FROM work_records wr
+            JOIN employees e ON wr.employee_id = e.id
+            ORDER BY wr.%s %s LIMIT ? OFFSET ?
+            """,
+            sortBy, direction
+        );
+
+        List<WorkRecord> workRecords = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, pageRequest.getPageSize());
+            ps.setInt(2, pageRequest.getOffset());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    workRecords.add(mapResultSetToWorkRecord(rs));
+                }
+            }
+
+            log.debug("Fetched page {} with {} work records", pageRequest.getPageNumber(), workRecords.size());
+            return Page.of(workRecords, pageRequest, totalElements);
+
+        } catch (SQLException e) {
+            log.error("Error finding work records with pagination", e);
+            throw new ExecutionException("Database error", e);
+        }
+    }
+
+    @Override
+    public long count() throws ExecutionException, InterruptedException {
+        String sql = "SELECT COUNT(*) FROM work_records";
+
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            if (rs.next()) {
+                return rs.getLong(1);
+            }
+            return 0;
+
+        } catch (SQLException e) {
+            log.error("Error counting work records", e);
+            throw new ExecutionException("Database error", e);
+        }
     }
 }
