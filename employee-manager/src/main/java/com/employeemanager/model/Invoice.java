@@ -36,16 +36,16 @@ public class Invoice {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @Transient
+    @Column(name = "invoice_date", nullable = false)
     private LocalDate invoiceDate;
 
-    @Transient
+    @Column(name = "payment_deadline")
     private LocalDate paymentDeadline;
 
-    @Transient
+    @Column(name = "delivery_date")
     private LocalDate deliveryDate;
 
-    @Transient
+    @Column(name = "payment_date")
     private LocalDate paymentDate;
 
     @Column(name = "payment_method")
@@ -79,7 +79,7 @@ public class Invoice {
     @Column(name = "nav_transaction_id")
     private String navTransactionId;
 
-    @Transient
+    @Column(name = "nav_sent_at")
     private LocalDateTime navSentAt;
 
     @Column(name = "footer_text", length = 1000)
@@ -87,10 +87,10 @@ public class Invoice {
 
     private String notes;
 
-    @Transient
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Transient
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
