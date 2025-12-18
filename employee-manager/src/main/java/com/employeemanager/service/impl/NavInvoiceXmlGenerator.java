@@ -162,6 +162,7 @@ public class NavInvoiceXmlGenerator {
 
     /**
      * Számla részletek hozzáadása
+     * Jogszabályi megfelelés: 2007. évi CXXVII. törvény + NAV Online Számla 3.0
      */
     private void addInvoiceDetail(Document doc, Element parent, Invoice invoice) {
         Element invoiceDetail = doc.createElement("invoiceDetail");
@@ -182,6 +183,12 @@ public class NavInvoiceXmlGenerator {
         addTextElement(doc, invoiceDetail, "currencyCode",
             invoice.getCurrency() != null ? invoice.getCurrency() : "HUF");
 
+        // Árfolyam - NAV KÖTELEZŐ MEZŐ! (Forintos számlánál is! érték: 1.000000)
+        String exchangeRate = invoice.getExchangeRate() != null ?
+                invoice.getExchangeRate().setScale(6, RoundingMode.HALF_UP).toString() :
+                "1.000000";
+        addTextElement(doc, invoiceDetail, "exchangeRate", exchangeRate);
+
         // Fizetési mód
         addTextElement(doc, invoiceDetail, "paymentMethod", "TRANSFER");
 
@@ -191,12 +198,30 @@ public class NavInvoiceXmlGenerator {
                 invoice.getPaymentDeadline().format(DATE_FORMATTER));
         }
 
+        // Fordított adózás jelölése (2007. évi CXXVII. törvény)
+        if (invoice.getIsReverseCharge() != null && invoice.getIsReverseCharge()) {
+            addTextElement(doc, invoiceDetail, "invoiceAppearance", "ELECTRONIC");
+            Element additionalInvoiceData = doc.createElement("additionalInvoiceData");
+            invoiceDetail.appendChild(additionalInvoiceData);
+            addTextElement(doc, additionalInvoiceData, "dataName", "Fordított adózás");
+            addTextElement(doc, additionalInvoiceData, "dataDescription", "fordított adózás");
+        }
+
+        // Pénzforgalmi elszámolás jelölése (2007. évi CXXVII. törvény)
+        if (invoice.getIsCashAccounting() != null && invoice.getIsCashAccounting()) {
+            Element additionalInvoiceData = doc.createElement("additionalInvoiceData");
+            invoiceDetail.appendChild(additionalInvoiceData);
+            addTextElement(doc, additionalInvoiceData, "dataName", "Pénzforgalmi elszámolás");
+            addTextElement(doc, additionalInvoiceData, "dataDescription", "pénzforgalmi elszámolás");
+        }
+
         // Számlaszám
         addTextElement(doc, invoiceDetail, "invoiceNumber", invoice.getInvoiceNumber());
     }
 
     /**
      * Számla tétel hozzáadása
+     * Jogszabályi megfelelés: ÁFA mentességi ok kezelése
      */
     private void addInvoiceLine(Document doc, Element parent, InvoiceItem item, int lineNumber) {
         Element line = doc.createElement("line");
@@ -217,12 +242,26 @@ public class NavInvoiceXmlGenerator {
         // Egységár
         addTextElement(doc, line, "unitPrice", item.getUnitPrice().setScale(2, RoundingMode.HALF_UP).toString());
 
-        // ÁFA kulcs
+        // ÁFA kulcs és mentesség kezelése
         Element lineVatData = doc.createElement("lineVatData");
         line.appendChild(lineVatData);
 
-        addTextElement(doc, lineVatData, "lineVatContent", "true");
-        addTextElement(doc, lineVatData, "lineVatRate", item.getVatRate().setScale(2, RoundingMode.HALF_UP).toString());
+        // Ha van ÁFA mentességi ok, akkor speciális kezelés
+        if (item.getVatExemptionReason() != null && !item.getVatExemptionReason().isEmpty()) {
+            addTextElement(doc, lineVatData, "lineVatContent", "false");
+            addTextElement(doc, lineVatData, "lineVatExemption", "TAM"); // ÁFA mentes (TAM = adómentes)
+
+            // Mentességi ok részletezése
+            Element lineVatExemptionReason = doc.createElement("lineVatExemptionReason");
+            lineVatExemptionReason.setTextContent(item.getVatExemptionReason());
+            lineVatData.appendChild(lineVatExemptionReason);
+        } else {
+            // Normál ÁFA
+            addTextElement(doc, lineVatData, "lineVatContent", "true");
+
+            BigDecimal vatRate = item.getVatRate() != null ? item.getVatRate() : BigDecimal.ZERO;
+            addTextElement(doc, lineVatData, "lineVatRate", vatRate.setScale(2, RoundingMode.HALF_UP).toString());
+        }
 
         // Nettó érték
         addTextElement(doc, line, "lineNetAmount", item.getNetAmount().setScale(2, RoundingMode.HALF_UP).toString());
