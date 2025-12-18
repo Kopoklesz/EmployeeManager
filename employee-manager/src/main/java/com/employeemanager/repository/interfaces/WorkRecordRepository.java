@@ -19,4 +19,6 @@ public interface WorkRecordRepository extends BaseRepository<WorkRecord, String>
             LocalDate notifStart, LocalDate notifEnd,
             LocalDate workStart, LocalDate workEnd)
             throws ExecutionException, InterruptedException;
+            void delete(String id) throws ExecutionException, InterruptedException;
+            List<WorkRecord> findAll() throws ExecutionException, InterruptedException;
 }

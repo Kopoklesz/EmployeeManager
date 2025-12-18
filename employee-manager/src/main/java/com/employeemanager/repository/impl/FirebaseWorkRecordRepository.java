@@ -5,12 +5,14 @@ import com.employeemanager.model.WorkRecord;
 import com.employeemanager.repository.interfaces.EmployeeRepository;
 import com.employeemanager.repository.interfaces.WorkRecordRepository;
 import com.employeemanager.util.FirebaseDateConverter;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -244,6 +246,38 @@ public class FirebaseWorkRecordRepository extends BaseFirebaseRepository<WorkRec
         } catch (Exception e) {
             log.error("Error fetching work records by both dates: {}", e.getMessage(), e);
             throw new ExecutionException("Failed to fetch work records", e);
+        }
+    }
+
+    @Override
+    public void delete(String id) throws ExecutionException, InterruptedException {
+        deleteById(id);  
+    }
+
+    @Override
+    public List<WorkRecord> findAll() throws ExecutionException, InterruptedException {
+        try {
+            // Használjuk a firestore.collection(collectionName) hívást
+            QuerySnapshot querySnapshot = firestore.collection(collectionName).get().get();
+            List<WorkRecord> records = new ArrayList<>();
+            
+            for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                Map<String, Object> data = doc.getData();
+                if (data != null) {
+                    data.put("id", doc.getId()); // Biztosítjuk, hogy az ID benne legyen
+                    WorkRecord record = convertFromMap(data);
+                    if (record != null) {
+                        records.add(record);
+                    }
+                }
+            }
+            
+            log.debug("Found {} work records in collection: {}", records.size(), collectionName);
+            return records;
+            
+        } catch (Exception e) {
+            log.error("Failed to fetch all work records", e);
+            throw new ExecutionException("Failed to fetch all work records", e);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.employeemanager.service.interfaces;
 
+import com.employeemanager.model.Employee;
 import com.employeemanager.model.WorkRecord;
 import com.employeemanager.service.exception.ServiceException;
 
@@ -10,4 +11,5 @@ public interface WorkRecordService extends BaseService<WorkRecord, String> {
     List<WorkRecord> getMonthlyRecords(LocalDate startDate, LocalDate endDate) throws ServiceException;
     List<WorkRecord> getEmployeeMonthlyRecords(String employeeId, LocalDate startDate, LocalDate endDate) throws ServiceException;
     boolean validateWorkRecord(WorkRecord workRecord);
+    List<WorkRecord> findByEmployee(Employee employee) throws ServiceException;
 }

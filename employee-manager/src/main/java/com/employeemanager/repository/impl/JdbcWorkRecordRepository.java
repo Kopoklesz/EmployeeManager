@@ -142,21 +142,17 @@ public class JdbcWorkRecordRepository implements WorkRecordRepository {
     
     @Override
     public List<WorkRecord> findAll() throws ExecutionException, InterruptedException {
-        String sql = """
-            SELECT wr.*, e.name as employee_name, e.social_security_number 
-            FROM work_records wr
-            JOIN employees e ON wr.employee_id = e.id
-            ORDER BY wr.work_date DESC, e.name
-            """;
+        String sql = "SELECT * FROM work_records ORDER BY work_date DESC";
         
         List<WorkRecord> workRecords = new ArrayList<>();
         
         try (Connection conn = dataSource.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+            PreparedStatement ps = conn.prepareStatement(sql)) {
             
-            while (rs.next()) {
-                workRecords.add(mapResultSetToWorkRecord(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    workRecords.add(mapResultSetToWorkRecord(rs));
+                }
             }
             
             log.debug("Found {} work records", workRecords.size());
@@ -431,5 +427,10 @@ public class JdbcWorkRecordRepository implements WorkRecordRepository {
         }
         
         return record;
+    }
+
+    @Override
+    public void delete(String id) throws ExecutionException, InterruptedException {
+        deleteById(id);  // Meghívjuk a deleteById metódust
     }
 }
