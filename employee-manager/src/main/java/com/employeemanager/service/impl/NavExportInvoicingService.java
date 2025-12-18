@@ -14,9 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 public class NavExportInvoicingService implements InvoicingService {
 
     private final NavInvoiceXmlGenerator xmlGenerator;
+    private final InvoicePdfGenerator pdfGenerator;
 
-    public NavExportInvoicingService(NavInvoiceXmlGenerator xmlGenerator) {
+    public NavExportInvoicingService(NavInvoiceXmlGenerator xmlGenerator, InvoicePdfGenerator pdfGenerator) {
         this.xmlGenerator = xmlGenerator;
+        this.pdfGenerator = pdfGenerator;
     }
 
     @Override
@@ -66,10 +68,14 @@ public class NavExportInvoicingService implements InvoicingService {
 
     @Override
     public byte[] downloadInvoicePdf(Invoice invoice) throws Exception {
-        // NAV export nem generál PDF-et, csak XML-t
-        // PDF generálást a külön PDF generátor modul végzi majd
-        log.warn("NAV export service does not generate PDF. Use dedicated PDF generator.");
-        return null;
+        log.info("Generating PDF for invoice: {}", invoice.getInvoiceNumber());
+
+        try {
+            return pdfGenerator.generatePdf(invoice);
+        } catch (Exception e) {
+            log.error("Failed to generate PDF for invoice: {}", invoice.getInvoiceNumber(), e);
+            throw new Exception("PDF generálás sikertelen: " + e.getMessage(), e);
+        }
     }
 
     @Override
