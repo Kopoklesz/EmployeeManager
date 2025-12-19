@@ -340,9 +340,9 @@ public class CompanySettingsDialog extends Dialog<CompanySettings> {
             companyZipCodeField.setText(settings.getCompanyZipCode());
             companyCityField.setText(settings.getCompanyCity());
             companyTaxNumberField.setText(settings.getCompanyTaxNumber());
-            companyEuTaxNumberField.setText(settings.getCompanyEuTaxNumber());
-            companyBankAccountField.setText(settings.getBankAccountNumber());
-            companyBankNameField.setText(settings.getBankName());
+            companyEuTaxNumberField.setText(settings.getCompanyEUTaxNumber());
+            companyBankAccountField.setText(settings.getCompanyBankAccount());
+            companyBankNameField.setText(settings.getCompanyBankName());
             companyEmailField.setText(settings.getCompanyEmail());
             companyPhoneField.setText(settings.getCompanyPhone());
             companyWebsiteField.setText(settings.getCompanyWebsite());
@@ -363,7 +363,7 @@ public class CompanySettingsDialog extends Dialog<CompanySettings> {
 
             // Számlázó backend
             invoicingBackendComboBox.setValue(
-                InvoicingService.BackendType.fromCode(settings.getInvoicing_backend())
+                InvoicingService.BackendType.fromCode(settings.getInvoicingBackend())
             );
             szamlazzAgentKeyField.setText(settings.getSzamlazzAgentKey());
             billingoApiKeyField.setText(settings.getBillingoApiKey());
@@ -383,12 +383,12 @@ public class CompanySettingsDialog extends Dialog<CompanySettings> {
 
             // Validálás
             if (companyNameField.getText() == null || companyNameField.getText().trim().isEmpty()) {
-                AlertHelper.showWarning("Figyelem", "Hiányzó adat", "A cégnév megadása kötelező!");
+                AlertHelper.showWarning("Figyelem", "A cégnév megadása kötelező!");
                 return null;
             }
 
             if (companyTaxNumberField.getText() == null || companyTaxNumberField.getText().trim().isEmpty()) {
-                AlertHelper.showWarning("Figyelem", "Hiányzó adat", "Az adószám megadása kötelező!");
+                AlertHelper.showWarning("Figyelem", "Az adószám megadása kötelező!");
                 return null;
             }
 
@@ -398,9 +398,9 @@ public class CompanySettingsDialog extends Dialog<CompanySettings> {
             settings.setCompanyZipCode(companyZipCodeField.getText());
             settings.setCompanyCity(companyCityField.getText());
             settings.setCompanyTaxNumber(companyTaxNumberField.getText());
-            settings.setCompanyEuTaxNumber(companyEuTaxNumberField.getText());
-            settings.setBankAccountNumber(companyBankAccountField.getText());
-            settings.setBankName(companyBankNameField.getText());
+            settings.setCompanyEUTaxNumber(companyEuTaxNumberField.getText());
+            settings.setCompanyBankAccount(companyBankAccountField.getText());
+            settings.setCompanyBankName(companyBankNameField.getText());
             settings.setCompanyEmail(companyEmailField.getText());
             settings.setCompanyPhone(companyPhoneField.getText());
             settings.setCompanyWebsite(companyWebsiteField.getText());
@@ -410,7 +410,7 @@ public class CompanySettingsDialog extends Dialog<CompanySettings> {
             settings.setInvoiceNextNumber(invoiceNextNumberSpinner.getValue());
             settings.setDefaultPaymentDeadlineDays(defaultPaymentDeadlineDaysSpinner.getValue());
             settings.setDefaultCurrency(defaultCurrencyComboBox.getValue());
-            settings.setDefaultVatRate(java.math.BigDecimal.valueOf(defaultVatRateSpinner.getValue()));
+            settings.setDefaultVatRate(defaultVatRateSpinner.getValue());
             settings.setInvoiceFooterText(invoiceFooterTextArea.getText());
 
             // NAV beállítások
@@ -420,14 +420,14 @@ public class CompanySettingsDialog extends Dialog<CompanySettings> {
             settings.setNavTestMode(navTestModeCheckBox.isSelected());
 
             // Számlázó backend
-            settings.setInvoicing_backend(invoicingBackendComboBox.getValue().getCode());
+            settings.setInvoicingBackend(invoicingBackendComboBox.getValue().getCode());
             settings.setSzamlazzAgentKey(szamlazzAgentKeyField.getText());
             settings.setBillingoApiKey(billingoApiKeyField.getText());
 
             // Mentés
             CompanySettings savedSettings = settingsRepository.save(settings);
 
-            AlertHelper.showInfo("Siker", "Beállítások mentve", "A céges beállítások sikeresen elmentve!");
+            AlertHelper.showInformation("Siker", "Beállítások mentve", "A céges beállítások sikeresen elmentve!");
 
             return savedSettings;
 

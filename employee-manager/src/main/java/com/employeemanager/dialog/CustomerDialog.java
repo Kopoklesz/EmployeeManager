@@ -308,7 +308,7 @@ public class CustomerDialog extends Dialog<Customer> {
         try {
             // Validálás
             if (nameField.getText() == null || nameField.getText().trim().isEmpty()) {
-                AlertHelper.showWarning("Figyelem", "Hiányzó adat", "A név megadása kötelező!");
+                AlertHelper.showWarning("Figyelem", "A név megadása kötelező!");
                 return null;
             }
 
@@ -317,7 +317,7 @@ public class CustomerDialog extends Dialog<Customer> {
                 String taxNumber = taxNumberField.getText();
                 if (taxNumber != null && !taxNumber.trim().isEmpty()) {
                     if (!customerService.isValidTaxNumber(taxNumber)) {
-                        AlertHelper.showWarning("Figyelem", "Érvénytelen adószám",
+                        AlertHelper.showWarning("Figyelem",
                             "Az adószám formátuma nem megfelelő! (Helyes formátum: 12345678-1-23)");
                         return null;
                     }
@@ -325,7 +325,7 @@ public class CustomerDialog extends Dialog<Customer> {
                     // Ellenőrzés: már létezik-e ilyen adószámú vevő
                     if (!isEditMode || !taxNumber.equals(existingCustomer.getTaxNumber())) {
                         if (customerService.existsByTaxNumber(taxNumber)) {
-                            AlertHelper.showWarning("Figyelem", "Duplikált adószám",
+                            AlertHelper.showWarning("Figyelem",
                                 "Már létezik vevő ezzel az adószámmal!");
                             return null;
                         }
@@ -337,7 +337,7 @@ public class CustomerDialog extends Dialog<Customer> {
             String email = emailField.getText();
             if (email != null && !email.trim().isEmpty()) {
                 if (!customerService.isValidEmail(email)) {
-                    AlertHelper.showWarning("Figyelem", "Érvénytelen email",
+                    AlertHelper.showWarning("Figyelem",
                         "Az email cím formátuma nem megfelelő!");
                     return null;
                 }

@@ -257,12 +257,12 @@ public class InvoiceItemDialog extends Dialog<InvoiceItem> {
         try {
             // Validálás
             if (descriptionField.getText() == null || descriptionField.getText().trim().isEmpty()) {
-                AlertHelper.showWarning("Figyelem", "Hiányzó adat", "A megnevezés megadása kötelező!");
+                AlertHelper.showWarning("Figyelem", "A megnevezés megadása kötelező!");
                 return null;
             }
 
             if (unitComboBox.getValue() == null || unitComboBox.getValue().trim().isEmpty()) {
-                AlertHelper.showWarning("Figyelem", "Hiányzó adat", "A mértékegység megadása kötelező!");
+                AlertHelper.showWarning("Figyelem", "A mértékegység megadása kötelező!");
                 return null;
             }
 

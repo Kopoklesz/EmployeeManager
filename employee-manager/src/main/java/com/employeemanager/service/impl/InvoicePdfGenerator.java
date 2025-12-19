@@ -138,8 +138,8 @@ public class InvoicePdfGenerator {
         }
 
         // EU adószám
-        if (settings.getCompanyEuTaxNumber() != null && !settings.getCompanyEuTaxNumber().isEmpty()) {
-            headerTable.addCell(new Cell().add(new Paragraph("EU adószám: " + settings.getCompanyEuTaxNumber())
+        if (settings.getCompanyEUTaxNumber() != null && !settings.getCompanyEUTaxNumber().isEmpty()) {
+            headerTable.addCell(new Cell().add(new Paragraph("EU adószám: " + settings.getCompanyEUTaxNumber())
                 .setFont(normalFont).setFontSize(10)).setBorder(Border.NO_BORDER));
         }
 
@@ -337,9 +337,9 @@ public class InvoicePdfGenerator {
             .setBorder(Border.NO_BORDER)
             .setPadding(5));
 
-        if (settings.getBankName() != null && settings.getBankAccountNumber() != null) {
+        if (settings.getCompanyBankName() != null && settings.getCompanyBankAccount() != null) {
             paymentTable.addCell(new Cell().add(new Paragraph(
-                "Bankszámlaszám: " + settings.getBankAccountNumber() + " (" + settings.getBankName() + ")")
+                "Bankszámlaszám: " + settings.getCompanyBankAccount() + " (" + settings.getCompanyBankName() + ")")
                 .setFont(normalFont).setFontSize(10))
                 .setBorder(Border.NO_BORDER)
                 .setPadding(5));

@@ -419,7 +419,7 @@ public class InvoiceDialog extends Dialog<Invoice> {
     private void editItem() {
         InvoiceItem selectedItem = itemsTable.getSelectionModel().getSelectedItem();
         if (selectedItem == null) {
-            AlertHelper.showWarning("Figyelem", "Nincs kiválasztva tétel", "Válassz ki egy tételt a szerkesztéshez!");
+            AlertHelper.showWarning("Figyelem", "Válassz ki egy tételt a szerkesztéshez!");
             return;
         }
 
@@ -437,7 +437,7 @@ public class InvoiceDialog extends Dialog<Invoice> {
     private void deleteItem() {
         InvoiceItem selectedItem = itemsTable.getSelectionModel().getSelectedItem();
         if (selectedItem == null) {
-            AlertHelper.showWarning("Figyelem", "Nincs kiválasztva tétel", "Válassz ki egy tételt a törléshez!");
+            AlertHelper.showWarning("Figyelem", "Válassz ki egy tételt a törléshez!");
             return;
         }
 
@@ -502,18 +502,18 @@ public class InvoiceDialog extends Dialog<Invoice> {
         try {
             // Validálás
             if (customerComboBox.getValue() == null) {
-                AlertHelper.showWarning("Figyelem", "Hiányzó adat", "Válassz ki egy vevőt!");
+                AlertHelper.showWarning("Figyelem", "Válassz ki egy vevőt!");
                 return null;
             }
 
             if (invoiceDatePicker.getValue() == null || deliveryDatePicker.getValue() == null ||
                 paymentDeadlinePicker.getValue() == null) {
-                AlertHelper.showWarning("Figyelem", "Hiányzó dátum", "Minden dátum megadása kötelező!");
+                AlertHelper.showWarning("Figyelem", "Minden dátum megadása kötelező!");
                 return null;
             }
 
             if (items.isEmpty()) {
-                AlertHelper.showWarning("Figyelem", "Nincs tétel", "Adj hozzá legalább egy tételt a számlához!");
+                AlertHelper.showWarning("Figyelem", "Adj hozzá legalább egy tételt a számlához!");
                 return null;
             }
 
