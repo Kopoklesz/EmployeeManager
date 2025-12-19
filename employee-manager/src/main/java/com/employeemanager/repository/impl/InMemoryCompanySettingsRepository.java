@@ -77,11 +77,11 @@ public class InMemoryCompanySettingsRepository implements CompanySettingsReposit
             .defaultCurrency(current.getDefaultCurrency())
             .defaultVatRate(current.getDefaultVatRate())
             .invoicingBackend(current.getInvoicingBackend())
-            .szamlazzHuApiKey(current.getSzamlazzHuApiKey())
+            .szamlazzAgentKey(current.getSzamlazzAgentKey())
             .billingoApiKey(current.getBillingoApiKey())
             .navTechnicalUser(current.getNavTechnicalUser())
             .navSignatureKey(current.getNavSignatureKey())
-            .navExchangeKey(current.getNavExchangeKey())
+            .navReplacementKey(current.getNavReplacementKey())
             .navTestMode(current.getNavTestMode())
             .build();
     }
