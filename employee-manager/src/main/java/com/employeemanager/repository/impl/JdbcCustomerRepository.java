@@ -239,12 +239,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
 
             long totalElements = count();
 
-            return new Page<>(
-                    customers,
-                    pageRequest.getPageNumber(),
-                    pageRequest.getPageSize(),
-                    totalElements
-            );
+            return Page.of(customers, pageRequest, totalElements);
 
         } catch (SQLException e) {
             log.error("Error finding customers with pagination", e);
@@ -363,12 +358,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
 
             long totalElements = countByIsActive(isActive);
 
-            return new Page<>(
-                    customers,
-                    pageRequest.getPageNumber(),
-                    pageRequest.getPageSize(),
-                    totalElements
-            );
+            return Page.of(customers, pageRequest, totalElements);
 
         } catch (SQLException e) {
             log.error("Error finding customers by active status with pagination", e);

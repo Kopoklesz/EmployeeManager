@@ -226,16 +226,22 @@ public class InvoicePdfGenerator {
 
         // Fordított adózás jelzése
         if (invoice.getIsReverseCharge() != null && invoice.getIsReverseCharge()) {
-            invoiceDataTable.addCell(createInfoCell("", false).setRowspan(1).setColspan(2)
-                .add(new Paragraph("FORDÍTOTT ADÓZÁS").setFont(boldFont).setFontSize(10)
-                    .setFontColor(ColorConstants.RED)));
+            Cell reverseChargeCell = createInfoCell("", false);
+            reverseChargeCell.setRowSpan(1);
+            reverseChargeCell.setColSpan(2);
+            reverseChargeCell.add(new Paragraph("FORDÍTOTT ADÓZÁS").setFont(boldFont).setFontSize(10)
+                .setFontColor(ColorConstants.RED));
+            invoiceDataTable.addCell(reverseChargeCell);
         }
 
         // Pénzforgalmi elszámolás jelzése
         if (invoice.getIsCashAccounting() != null && invoice.getIsCashAccounting()) {
-            invoiceDataTable.addCell(createInfoCell("", false).setRowspan(1).setColspan(2)
-                .add(new Paragraph("PÉNZFORGALMI ELSZÁMOLÁS").setFont(boldFont).setFontSize(10)
-                    .setFontColor(ColorConstants.RED)));
+            Cell cashAccountingCell = createInfoCell("", false);
+            cashAccountingCell.setRowSpan(1);
+            cashAccountingCell.setColSpan(2);
+            cashAccountingCell.add(new Paragraph("PÉNZFORGALMI ELSZÁMOLÁS").setFont(boldFont).setFontSize(10)
+                .setFontColor(ColorConstants.RED));
+            invoiceDataTable.addCell(cashAccountingCell);
         }
 
         infoTable.addCell(new Cell().add(invoiceDataTable).setBorder(Border.NO_BORDER));

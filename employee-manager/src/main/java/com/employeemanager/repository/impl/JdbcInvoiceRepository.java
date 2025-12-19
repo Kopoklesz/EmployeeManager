@@ -360,12 +360,7 @@ public class JdbcInvoiceRepository implements InvoiceRepository {
 
             long totalElements = count();
 
-            return new Page<>(
-                    invoices,
-                    pageRequest.getPageNumber(),
-                    pageRequest.getPageSize(),
-                    totalElements
-            );
+            return Page.of(invoices, pageRequest, totalElements);
 
         } catch (SQLException e) {
             log.error("Error finding invoices with pagination", e);
@@ -464,12 +459,7 @@ public class JdbcInvoiceRepository implements InvoiceRepository {
 
             long totalElements = countByCustomerId(customerId);
 
-            return new Page<>(
-                    invoices,
-                    pageRequest.getPageNumber(),
-                    pageRequest.getPageSize(),
-                    totalElements
-            );
+            return Page.of(invoices, pageRequest, totalElements);
 
         } catch (SQLException e) {
             log.error("Error finding invoices by customer with pagination", e);
@@ -525,12 +515,7 @@ public class JdbcInvoiceRepository implements InvoiceRepository {
 
             long totalElements = countByStatus(status);
 
-            return new Page<>(
-                    invoices,
-                    pageRequest.getPageNumber(),
-                    pageRequest.getPageSize(),
-                    totalElements
-            );
+            return Page.of(invoices, pageRequest, totalElements);
 
         } catch (SQLException e) {
             log.error("Error finding invoices by status with pagination", e);

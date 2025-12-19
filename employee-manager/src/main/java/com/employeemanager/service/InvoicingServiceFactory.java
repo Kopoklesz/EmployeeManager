@@ -39,7 +39,7 @@ public class InvoicingServiceFactory {
     public InvoicingService getCurrentService() {
         try {
             CompanySettings settings = settingsRepository.get();
-            String backend = settings.getInvoicing_backend();
+            String backend = settings.getInvoicingBackend();
 
             InvoicingService.BackendType backendType =
                 InvoicingService.BackendType.fromCode(backend);

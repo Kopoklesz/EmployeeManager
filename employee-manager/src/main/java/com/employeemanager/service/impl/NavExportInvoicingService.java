@@ -1,6 +1,8 @@
 package com.employeemanager.service.impl;
 
+import com.employeemanager.model.CompanySettings;
 import com.employeemanager.model.Invoice;
+import com.employeemanager.repository.interfaces.CompanySettingsRepository;
 import com.employeemanager.service.InvoicingService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,10 +17,12 @@ public class NavExportInvoicingService implements InvoicingService {
 
     private final NavInvoiceXmlGenerator xmlGenerator;
     private final InvoicePdfGenerator pdfGenerator;
+    private final CompanySettingsRepository settingsRepository;
 
-    public NavExportInvoicingService(NavInvoiceXmlGenerator xmlGenerator, InvoicePdfGenerator pdfGenerator) {
+    public NavExportInvoicingService(NavInvoiceXmlGenerator xmlGenerator, InvoicePdfGenerator pdfGenerator, CompanySettingsRepository settingsRepository) {
         this.xmlGenerator = xmlGenerator;
         this.pdfGenerator = pdfGenerator;
+        this.settingsRepository = settingsRepository;
     }
 
     @Override
@@ -26,8 +30,11 @@ public class NavExportInvoicingService implements InvoicingService {
         log.info("Generating NAV XML for invoice: {}", invoice.getInvoiceNumber());
 
         try {
+            // CompanySettings lekérése
+            CompanySettings settings = settingsRepository.get();
+
             // XML generálás
-            String xml = xmlGenerator.generateXml(invoice);
+            String xml = xmlGenerator.generateInvoiceXml(invoice, settings);
 
             // XML mentése byte array-ként
             byte[] xmlData = xml.getBytes("UTF-8");

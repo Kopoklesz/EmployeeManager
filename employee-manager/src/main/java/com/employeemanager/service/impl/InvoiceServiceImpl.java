@@ -448,7 +448,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             return false;
         }
 
-        if (invoice.getPaymentMethod() == null || invoice.getPaymentMethod().isEmpty()) {
+        if (invoice.getPaymentMethod() == null) {
             log.warn("Validation failed: Missing payment method");
             return false;
         }

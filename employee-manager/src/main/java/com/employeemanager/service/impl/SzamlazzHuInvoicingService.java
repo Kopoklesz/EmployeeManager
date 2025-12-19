@@ -209,8 +209,8 @@ public class SzamlazzHuInvoicingService implements InvoicingService {
 
         // Eladó (cég adatok)
         xml.append("  <elado>\n");
-        xml.append("    <bank>").append(escapeXml(settings.getBankName())).append("</bank>\n");
-        xml.append("    <bankszamlaszam>").append(settings.getBankAccountNumber()).append("</bankszamlaszam>\n");
+        xml.append("    <bank>").append(escapeXml(settings.getCompanyBankName())).append("</bank>\n");
+        xml.append("    <bankszamlaszam>").append(settings.getCompanyBankAccount()).append("</bankszamlaszam>\n");
         xml.append("  </elado>\n");
 
         // Vevő
