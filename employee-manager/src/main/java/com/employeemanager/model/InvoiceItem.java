@@ -146,6 +146,20 @@ public class InvoiceItem {
     }
 
     /**
+     * Alias getter: getUnit() -> getUnitOfMeasure()
+     */
+    public String getUnit() {
+        return unitOfMeasure;
+    }
+
+    /**
+     * Alias setter: setUnit() -> setUnitOfMeasure()
+     */
+    public void setUnit(String unit) {
+        this.unitOfMeasure = unit;
+    }
+
+    /**
      * Firebase számára Map formátumba konvertál
      */
     public Map<String, Object> toMap() {
