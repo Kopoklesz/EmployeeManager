@@ -144,7 +144,7 @@ public class JdbcInvoiceRepository implements InvoiceRepository {
             ps.setDate(4, invoice.getPaymentDeadline() != null ? Date.valueOf(invoice.getPaymentDeadline()) : null);
             ps.setDate(5, invoice.getDeliveryDate() != null ? Date.valueOf(invoice.getDeliveryDate()) : null);
             ps.setDate(6, invoice.getPaymentDate() != null ? Date.valueOf(invoice.getPaymentDate()) : null);
-            ps.setString(7, invoice.getPaymentMethod());
+            ps.setString(7, invoice.getPaymentMethod() != null ? invoice.getPaymentMethod().name() : null);
             ps.setString(8, invoice.getCurrency());
             ps.setBigDecimal(9, invoice.getExchangeRate() != null ? invoice.getExchangeRate() : BigDecimal.ONE);
             ps.setBigDecimal(10, invoice.getNetAmount());
@@ -184,7 +184,7 @@ public class JdbcInvoiceRepository implements InvoiceRepository {
         ps.setDate(5, invoice.getPaymentDeadline() != null ? Date.valueOf(invoice.getPaymentDeadline()) : null);
         ps.setDate(6, invoice.getDeliveryDate() != null ? Date.valueOf(invoice.getDeliveryDate()) : null);
         ps.setDate(7, invoice.getPaymentDate() != null ? Date.valueOf(invoice.getPaymentDate()) : null);
-        ps.setString(8, invoice.getPaymentMethod());
+        ps.setString(8, invoice.getPaymentMethod() != null ? invoice.getPaymentMethod().name() : null);
         ps.setString(9, invoice.getCurrency());
         ps.setBigDecimal(10, invoice.getExchangeRate() != null ? invoice.getExchangeRate() : BigDecimal.ONE);
         ps.setBigDecimal(11, invoice.getNetAmount());
@@ -362,7 +362,7 @@ public class JdbcInvoiceRepository implements InvoiceRepository {
 
             return new Page<>(
                     invoices,
-                    pageRequest.getPage(),
+                    pageRequest.getPageNumber(),
                     pageRequest.getPageSize(),
                     totalElements
             );
@@ -466,7 +466,7 @@ public class JdbcInvoiceRepository implements InvoiceRepository {
 
             return new Page<>(
                     invoices,
-                    pageRequest.getPage(),
+                    pageRequest.getPageNumber(),
                     pageRequest.getPageSize(),
                     totalElements
             );
@@ -527,7 +527,7 @@ public class JdbcInvoiceRepository implements InvoiceRepository {
 
             return new Page<>(
                     invoices,
-                    pageRequest.getPage(),
+                    pageRequest.getPageNumber(),
                     pageRequest.getPageSize(),
                     totalElements
             );
@@ -717,7 +717,10 @@ public class JdbcInvoiceRepository implements InvoiceRepository {
             invoice.setPaymentDate(paymentDate.toLocalDate());
         }
 
-        invoice.setPaymentMethod(rs.getString("payment_method"));
+        String paymentMethodStr = rs.getString("payment_method");
+        if (paymentMethodStr != null) {
+            invoice.setPaymentMethod(Invoice.PaymentMethod.valueOf(paymentMethodStr));
+        }
         invoice.setCurrency(rs.getString("currency"));
         invoice.setExchangeRate(rs.getBigDecimal("exchange_rate"));
         invoice.setNetAmount(rs.getBigDecimal("net_amount"));

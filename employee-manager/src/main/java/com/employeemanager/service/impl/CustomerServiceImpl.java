@@ -129,7 +129,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Page<Customer> getCustomers(PageRequest pageRequest) throws ExecutionException, InterruptedException {
-        log.debug("Getting customers with pagination - page: {}, size: {}", pageRequest.getPage(), pageRequest.getPageSize());
+        log.debug("Getting customers with pagination - page: {}, size: {}", pageRequest.getPageNumber(), pageRequest.getPageSize());
         return customerRepository.findAll(pageRequest);
     }
 

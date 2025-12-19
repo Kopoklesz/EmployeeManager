@@ -146,7 +146,7 @@ public class InvoiceDialog extends Dialog<Invoice> {
         // Vevő választás
         grid.add(new Label("Vevő:*"), 0, row);
         try {
-            List<Customer> customers = customerService.findByIsActive(true);
+            List<Customer> customers = customerService.getActiveCustomers();
             customerComboBox.setItems(FXCollections.observableArrayList(customers));
             customerComboBox.setConverter(new javafx.util.StringConverter<Customer>() {
                 @Override
@@ -486,7 +486,7 @@ public class InvoiceDialog extends Dialog<Invoice> {
         dialog.showAndWait().ifPresent(customer -> {
             // Frissítjük a vevő listát
             try {
-                List<Customer> customers = customerService.findByIsActive(true);
+                List<Customer> customers = customerService.getActiveCustomers();
                 customerComboBox.setItems(FXCollections.observableArrayList(customers));
                 customerComboBox.setValue(customer);
             } catch (Exception e) {

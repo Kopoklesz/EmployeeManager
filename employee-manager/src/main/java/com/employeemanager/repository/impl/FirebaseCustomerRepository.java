@@ -131,7 +131,7 @@ public class FirebaseCustomerRepository extends BaseFirebaseRepository<Customer>
 
         return new Page<>(
                 content,
-                pageRequest.getPage(),
+                pageRequest.getPageNumber(),
                 pageRequest.getPageSize(),
                 totalElements
         );

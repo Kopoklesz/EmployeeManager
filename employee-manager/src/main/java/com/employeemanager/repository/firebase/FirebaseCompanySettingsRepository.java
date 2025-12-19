@@ -1,7 +1,7 @@
 package com.employeemanager.repository.firebase;
 
 import com.employeemanager.model.CompanySettings;
-import com.employeemanager.repository.CompanySettingsRepository;
+import com.employeemanager.repository.interfaces.CompanySettingsRepository;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -15,18 +15,19 @@ import java.util.concurrent.ExecutionException;
  * Singleton pattern: mindig csak egy beállítás dokumentum létezik (id = "default")
  */
 @Slf4j
-public class FirebaseCompanySettingsRepository extends BaseFirebaseRepository implements CompanySettingsRepository {
+public class FirebaseCompanySettingsRepository implements CompanySettingsRepository {
 
+    private final Firestore firestore;
     private static final String COLLECTION_NAME = "company_settings";
     private static final String SETTINGS_ID = "default";
 
     public FirebaseCompanySettingsRepository(Firestore firestore) {
-        super(firestore, COLLECTION_NAME);
+        this.firestore = firestore;
     }
 
     @Override
     public CompanySettings get() throws ExecutionException, InterruptedException {
-        DocumentReference docRef = getCollection().document(SETTINGS_ID);
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(SETTINGS_ID);
         DocumentSnapshot document = docRef.get().get();
 
         if (document.exists()) {
@@ -43,7 +44,7 @@ public class FirebaseCompanySettingsRepository extends BaseFirebaseRepository im
         // Biztosítjuk, hogy az ID mindig "default" legyen
         settings.setId(SETTINGS_ID);
 
-        DocumentReference docRef = getCollection().document(SETTINGS_ID);
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(SETTINGS_ID);
         docRef.set(settings.toMap()).get();
 
         log.info("CompanySettings saved to Firebase");

@@ -241,7 +241,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
 
             return new Page<>(
                     customers,
-                    pageRequest.getPage(),
+                    pageRequest.getPageNumber(),
                     pageRequest.getPageSize(),
                     totalElements
             );
@@ -365,7 +365,7 @@ public class JdbcCustomerRepository implements CustomerRepository {
 
             return new Page<>(
                     customers,
-                    pageRequest.getPage(),
+                    pageRequest.getPageNumber(),
                     pageRequest.getPageSize(),
                     totalElements
             );
