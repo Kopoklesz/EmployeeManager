@@ -8,6 +8,7 @@ import com.employeemanager.model.dto.PageRequest;
 import com.employeemanager.repository.interfaces.InvoiceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -28,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 @Repository("jdbcInvoiceRepository")
 @RequiredArgsConstructor
+@ConditionalOnBean(DataSource.class)
 public class JdbcInvoiceRepository implements InvoiceRepository {
 
     protected final DataSource dataSource;
