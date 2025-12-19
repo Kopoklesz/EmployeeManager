@@ -1,7 +1,7 @@
 package com.employeemanager.dialog;
 
 import com.employeemanager.model.Customer;
-import com.employeemanager.service.CustomerService;
+import com.employeemanager.service.interfaces.CustomerService;
 import com.employeemanager.util.AlertHelper;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
