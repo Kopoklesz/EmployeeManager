@@ -3,7 +3,7 @@ package com.employeemanager.repository.impl;
 import com.employeemanager.model.CompanySettings;
 import com.employeemanager.repository.interfaces.CompanySettingsRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.util.concurrent.ExecutionException;
@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * In-memory CompanySettings Repository implementáció
  *
- * Ez az alapértelmezett implementáció, ami akkor lesz használva, ha nincs
+ * Ez az alapértelmezett implementáció (@Primary), ami akkor lesz használva, ha nincs
  * sem Firebase, sem JDBC konfiguráció. Memóriában tárolja az adatokat,
  * újraindításkor elvesznek.
  *
@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Slf4j
 @Repository("inMemoryCompanySettingsRepository")
-@ConditionalOnMissingBean(CompanySettingsRepository.class)
+@Primary
 public class InMemoryCompanySettingsRepository implements CompanySettingsRepository {
 
     private static final String SETTINGS_ID = "default";
