@@ -226,21 +226,21 @@ public class InvoicePdfGenerator {
 
         // Fordított adózás jelzése
         if (invoice.getIsReverseCharge() != null && invoice.getIsReverseCharge()) {
-            Cell reverseChargeCell = createInfoCell("", false);
-            reverseChargeCell.setRowspan(1);
-            reverseChargeCell.setColspan(2);
+            Cell reverseChargeCell = new Cell(1, 2); // 1 sor, 2 oszlop span
             reverseChargeCell.add(new Paragraph("FORDÍTOTT ADÓZÁS").setFont(boldFont).setFontSize(10)
-                .setFontColor(ColorConstants.RED));
+                .setFontColor(ColorConstants.RED))
+                .setBorder(Border.NO_BORDER)
+                .setPadding(2);
             invoiceDataTable.addCell(reverseChargeCell);
         }
 
         // Pénzforgalmi elszámolás jelzése
         if (invoice.getIsCashAccounting() != null && invoice.getIsCashAccounting()) {
-            Cell cashAccountingCell = createInfoCell("", false);
-            cashAccountingCell.setRowspan(1);
-            cashAccountingCell.setColspan(2);
+            Cell cashAccountingCell = new Cell(1, 2); // 1 sor, 2 oszlop span
             cashAccountingCell.add(new Paragraph("PÉNZFORGALMI ELSZÁMOLÁS").setFont(boldFont).setFontSize(10)
-                .setFontColor(ColorConstants.RED));
+                .setFontColor(ColorConstants.RED))
+                .setBorder(Border.NO_BORDER)
+                .setPadding(2);
             invoiceDataTable.addCell(cashAccountingCell);
         }
 
