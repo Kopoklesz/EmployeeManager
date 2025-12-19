@@ -6,6 +6,7 @@ import com.employeemanager.model.dto.PageRequest;
 import com.employeemanager.repository.interfaces.CustomerRepository;
 import com.google.cloud.firestore.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Repository("firebaseCustomerRepository")
+@ConditionalOnBean(Firestore.class)
 public class FirebaseCustomerRepository extends BaseFirebaseRepository<Customer> implements CustomerRepository {
 
     public FirebaseCustomerRepository(Firestore firestore) {

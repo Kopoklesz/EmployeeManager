@@ -6,6 +6,8 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.stereotype.Repository;
 
 import java.util.concurrent.ExecutionException;
 
@@ -15,6 +17,8 @@ import java.util.concurrent.ExecutionException;
  * Singleton pattern: mindig csak egy beállítás dokumentum létezik (id = "default")
  */
 @Slf4j
+@Repository("firebaseCompanySettingsRepository")
+@ConditionalOnBean(Firestore.class)
 public class FirebaseCompanySettingsRepository implements CompanySettingsRepository {
 
     private final Firestore firestore;
