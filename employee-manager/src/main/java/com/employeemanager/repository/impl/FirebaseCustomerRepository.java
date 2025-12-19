@@ -129,12 +129,7 @@ public class FirebaseCustomerRepository extends BaseFirebaseRepository<Customer>
 
         long totalElements = countByIsActive(isActive);
 
-        return new Page<>(
-                content,
-                pageRequest.getPageNumber(),
-                pageRequest.getPageSize(),
-                totalElements
-        );
+        return Page.of(content, pageRequest, totalElements);
     }
 
     @Override

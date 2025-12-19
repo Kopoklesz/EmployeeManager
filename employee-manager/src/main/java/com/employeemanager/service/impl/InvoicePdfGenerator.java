@@ -227,8 +227,8 @@ public class InvoicePdfGenerator {
         // Fordított adózás jelzése
         if (invoice.getIsReverseCharge() != null && invoice.getIsReverseCharge()) {
             Cell reverseChargeCell = createInfoCell("", false);
-            reverseChargeCell.setRowSpan(1);
-            reverseChargeCell.setColSpan(2);
+            reverseChargeCell.setRowspan(1);
+            reverseChargeCell.setColspan(2);
             reverseChargeCell.add(new Paragraph("FORDÍTOTT ADÓZÁS").setFont(boldFont).setFontSize(10)
                 .setFontColor(ColorConstants.RED));
             invoiceDataTable.addCell(reverseChargeCell);
@@ -237,8 +237,8 @@ public class InvoicePdfGenerator {
         // Pénzforgalmi elszámolás jelzése
         if (invoice.getIsCashAccounting() != null && invoice.getIsCashAccounting()) {
             Cell cashAccountingCell = createInfoCell("", false);
-            cashAccountingCell.setRowSpan(1);
-            cashAccountingCell.setColSpan(2);
+            cashAccountingCell.setRowspan(1);
+            cashAccountingCell.setColspan(2);
             cashAccountingCell.add(new Paragraph("PÉNZFORGALMI ELSZÁMOLÁS").setFont(boldFont).setFontSize(10)
                 .setFontColor(ColorConstants.RED));
             invoiceDataTable.addCell(cashAccountingCell);

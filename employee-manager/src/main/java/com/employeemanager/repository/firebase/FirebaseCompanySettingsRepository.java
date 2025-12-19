@@ -53,6 +53,13 @@ public class FirebaseCompanySettingsRepository implements CompanySettingsReposit
     }
 
     @Override
+    public boolean exists() throws ExecutionException, InterruptedException {
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(SETTINGS_ID);
+        DocumentSnapshot document = docRef.get().get();
+        return document.exists();
+    }
+
+    @Override
     public synchronized String generateNextInvoiceNumber() throws ExecutionException, InterruptedException {
         CompanySettings settings = get();
 
